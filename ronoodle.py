@@ -2,8 +2,9 @@
 
 Ready or Not's .pak files are Oodle-compressed, so reading the stock
 difficulty configs out of them needs the Oodle runtime.  Epic ships it
-statically linked inside the game .exe, so we use the freely
-redistributable OodleUE build instead (same one FModel / repak use).
+statically linked inside the game .exe, so we use a separately distributed
+OodleUE build instead (the same one FModel / repak use), subject to its own
+licensing terms.
 
 The DLL is downloaded once into this folder and reused afterwards.
 """

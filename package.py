@@ -19,7 +19,7 @@ import zipfile
 import ronoodle
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-NAME = 'MaxSuspectGenerator'
+NAME = 'RoNAIModGenerator'
 VERSION = '1.0'
 
 # The embeddable build is a plain zip of a working interpreter - no installer,
@@ -149,7 +149,12 @@ def main():
     opts = ap.parse_args()
 
     out, root = stage(opts)
-    tag = VERSION + ('' if opts.python else '-nopython')
+    tag_parts = [VERSION]
+    if not opts.python:
+        tag_parts.append('nopython')
+    if not opts.oodle:
+        tag_parts.append('nooodle')
+    tag = '-'.join(tag_parts)
     zpath = os.path.join(out, '%s-%s.zip' % (NAME, tag))
     if os.path.exists(zpath):
         os.remove(zpath)

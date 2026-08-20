@@ -12,9 +12,33 @@ right now, **new maps and DLC are covered automatically** — after a patch,
 open it and hit Build again. That is the whole point: the mods it replaces go
 stale every time the game adds a map.
 
-Requires Python 3.11 or newer ([python.org](https://www.python.org/downloads/),
-tick *Add python.exe to PATH*). Nothing else to install, nothing leaves your
-machine.
+## Choose how to get it
+
+### Normal way: clone and build
+
+Clone this repository and run it from the source folder:
+
+```bat
+git clone https://github.com/nutnnut/RoNAIModGenerator.git
+cd RoNAIModGenerator
+python app.py
+```
+
+Python 3.11 or newer is required ([python.org](https://www.python.org/downloads/);
+tick *Add python.exe to PATH*). You can also double-click
+`MAX SUSPECT Generator.cmd`, which checks for a suitable `py` or `python`
+command. The Oodle DLL is downloaded automatically the first time it is
+needed, subject to the terms that apply to that third-party component.
+
+### Portable way: download a Release
+
+For a machine with no Python installation, download the latest
+`RoNAIModGenerator-*.zip` from the repository's [Releases](https://github.com/nutnnut/RoNAIModGenerator/releases)
+page. Unpack it anywhere, then double-click `MAX SUSPECT Generator.cmd` inside
+the unpacked folder. The portable release includes Python and the Oodle DLL;
+there is no installer, PATH change, or registry entry.
+
+Both workflows use the same UI and install the generated pak in the same way.
 
 ---
 
@@ -220,9 +244,9 @@ opened straight out of an archive viewer — they go to
 `%LOCALAPPDATA%\MaxSuspectGen` instead. Nothing else is touched: no registry
 keys, no PATH, no installer.
 
-## Making a release zip
+## Making a release zip (maintainers)
 
-`python package.py` assembles `dist\MaxSuspectGenerator-1.0.zip`: the tool,
+`python package.py` assembles `dist\RoNAIModGenerator-1.0.zip`: the tool,
 `oo2core.dll`, and a bundled copy of the embeddable Python runtime under
 `runtime\python\`. That zip runs on a machine with no Python at all — unpack
 it anywhere, double-click the launcher. About 11 MB.
@@ -230,13 +254,17 @@ it anywhere, double-click the launcher. About 11 MB.
 | | |
 |---|---|
 | `python package.py` | everything bundled, ~11 MB, runs on a bare PC |
-| `python package.py --no-python` | ~120 KB, needs Python 3.11+ installed |
-| `python package.py --no-oodle` | leaves the DLL to be fetched on first run |
+| `python package.py --no-python` | `*-nopython.zip`; needs Python 3.11+ installed |
+| `python package.py --no-oodle` | `*-nooodle.zip`; fetches the DLL on first run |
 
 The launchers prefer `runtime\python\python.exe` when it is present and fall
 back to `py` / `python` on PATH otherwise, so the same folder works either
-way. `oo2core.dll` is the freely redistributable OodleUE build — the same one
-FModel and repak use — and is only needed to read the game's own paks.
+way. `oo2core.dll` is a third-party OodleUE build and is only needed to read
+the game's own paks. Confirm that you have permission to redistribute this
+component before uploading a portable ZIP; the upstream OodleUE project notes
+that its retrieved assets are subject to the Unreal Engine EULA. If that has
+not been cleared, use the `--no-oodle` build instead of publishing the bundled
+DLL.
 
 ## Notes
 

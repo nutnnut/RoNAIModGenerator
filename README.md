@@ -1,6 +1,7 @@
 # MAX SUSPECT Generator
 
-A difficulty mod for Ready or Not that you *build*, instead of download.
+Highly customizable / DIY make your own AI mod.
+Disclaimer: 100% AI Generated
 
 Double-click **`MAX SUSPECT Generator.cmd`**. A page opens in your browser,
 you pick how you want the game to play, and it writes a `.pak` straight into

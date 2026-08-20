@@ -296,6 +296,35 @@ AWARENESS_TIERS = {
 }
 AWARENESS_ORDER = ['oblivious', 'vanilla', 'sharp']
 
+# SuspectAccuracyLostPerMeterSecond is how many degrees of aim cone a suspect
+# gives up per m/s of its OWN movement - the game's own comment puts the average
+# speed while shooting at ~2.3 m/s.  Vanilla sets it around 0.035-0.045, which
+# at that speed widens a 2.5 degree cone by about 3 percent: near enough to
+# nothing, which is why sprinting suspects still hit you.  One stock map section
+# already uses 0.3, so the higher numbers here are in territory the game itself
+# treats as valid.
+
+MOVING_ACCURACY_TIERS = {
+    'heavy': {
+        'label': "Can't run and shoot",
+        'note': 'roughly doubles the cone at a walk, useless at a sprint',
+        'keys': {'SuspectAccuracyLostPerMeterSecond': 1.2},
+    },
+    'nerf': {
+        'label': 'Worse on the move',
+        'note': 'noticeably wilder while moving, still dangerous',
+        'keys': {'SuspectAccuracyLostPerMeterSecond': 0.4},
+    },
+    'vanilla': {'label': 'Vanilla', 'note': 'a ~3% penalty, i.e. barely any',
+                'keys': {}},
+    'full': {
+        'label': 'No penalty',
+        'note': 'shoots as well running as standing still',
+        'keys': {'SuspectAccuracyLostPerMeterSecond': 0.0},
+    },
+}
+MOVING_ACCURACY_ORDER = ['heavy', 'nerf', 'vanilla', 'full']
+
 # SwatHealth is your AI teammates only - the player's own durability lives in
 # the armour assets, not in Difficulty.ini, so it is out of reach here.  Health
 # and marksmanship are split because wanting tanky-but-useless teammates (or the
@@ -367,14 +396,15 @@ def _c(kind='mult', factor=1.0):
 def _p(susp, civ, acc, roam, hp_mode, hp, trap_mode, trap=1.0,
        give_up='vanilla', civ_give_up='vanilla', doors='vanilla',
        lesslethal='vanilla', awareness='vanilla', swat='vanilla',
-       swat_hp='vanilla'):
+       swat_hp='vanilla', moving='vanilla'):
     return {'suspects': susp, 'civilians': civ, 'accuracy': acc,
             'roaming': {'factor': roam},
             'health': {'mode': hp_mode, 'factor': hp},
             'traps': {'mode': trap_mode, 'factor': trap},
             'surrender': {'suspects': give_up, 'civilians': civ_give_up},
             'doors': doors, 'lesslethal': lesslethal,
-            'awareness': awareness, 'swat': swat, 'swat_hp': swat_hp}
+            'awareness': awareness, 'swat': swat, 'swat_hp': swat_hp,
+            'moving': moving}
 
 
 PRESETS = [
@@ -393,7 +423,7 @@ PRESETS = [
               'map. You are not going to win this one.',
      'settings': _p(_s('max'), _c('none'), 'aimbot', 3.0, 'consistent', 1.0,
                     'all', 2.0, give_up='hard', doors='locked',
-                    awareness='sharp', lesslethal='weak')},
+                    awareness='sharp', lesslethal='weak', moving='full')},
     {'id': 'hostage-crisis', 'name': 'Hostage Crisis',
      'blurb': 'Packed with civilians and half again as many suspects. '
               'Every trigger pull is a decision.',
@@ -408,7 +438,8 @@ PRESETS = [
      'blurb': 'Vanilla numbers, sharp suspects, low health both ways. '
               'Fights end in one or two rounds.',
      'settings': _p(_s(), _c(), 'accurate', 1.0, 'consistent', 0.5, 'vanilla',
-                    lesslethal='strong', swat='strong', swat_hp='strong')},
+                    lesslethal='strong', swat='strong', swat_hp='strong',
+                    moving='nerf')},
     {'id': 'bullet-sponge', 'name': 'Bullet Sponge',
      'blurb': 'Vanilla counts, double health, good aim. Shot placement matters.',
      'settings': _p(_s(), _c(), 'accurate', 1.0, 'consistent', 2.0, 'vanilla')},
@@ -417,13 +448,14 @@ PRESETS = [
               'or nothing.',
      'settings': _p(_s('mult', 1.5), _c('none'), 'aimbot', 3.0,
                     'consistent', 0.5, 'vanilla', give_up='hard',
-                    awareness='sharp')},
+                    awareness='sharp', moving='full')},
     {'id': 'training-day', 'name': 'Training Day',
      'blurb': 'Half the suspects, terrible aim, soft targets, no traps. '
               'For learning maps.',
      'settings': _p(_s('mult', 0.5), _c(), 'blind', 0.5, 'vanilla', 0.5, 'removed',
                     give_up='easy', civ_give_up='easy', doors='open',
-                    awareness='oblivious', lesslethal='strong', swat='strong', swat_hp='strong')},
+                    awareness='oblivious', lesslethal='strong', swat='strong',
+                    swat_hp='strong', moving='heavy')},
     {'id': 'lockdown', 'name': 'Lockdown',
      'blurb': 'Vanilla counts, but the building is sealed and everyone inside is '
               'paying attention. A breaching and stealth problem.',
@@ -450,6 +482,7 @@ DEFAULT_SETTINGS = {
     'awareness': 'vanilla',
     'swat': 'vanilla',
     'swat_hp': 'vanilla',
+    'moving': 'vanilla',
     'advanced': {
         'game_dir': '',
         'difficulties': ['HardDifficulty', 'StandardDifficulty', 'CasualDifficulty'],
@@ -500,7 +533,7 @@ def build_conf(settings):
     """Map UI settings onto the config dict `generate.build` consumes."""
     s = copy.deepcopy(DEFAULT_SETTINGS)
     for key in ('preset', 'accuracy', 'doors', 'lesslethal', 'awareness',
-                'swat', 'swat_hp'):
+                'swat', 'swat_hp', 'moving'):
         if key in settings:
             s[key] = settings[key]
     for key in ('suspects', 'civilians', 'roaming', 'health', 'traps',
@@ -560,7 +593,8 @@ def build_conf(settings):
                         (LESS_LETHAL_TIERS, s['lesslethal']),
                         (AWARENESS_TIERS, s['awareness']),
                         (SWAT_TIERS, s['swat']),
-                        (SWAT_HP_TIERS, s['swat_hp'])):
+                        (SWAT_HP_TIERS, s['swat_hp']),
+                        (MOVING_ACCURACY_TIERS, s['moving'])):
         for k, v in table.get(pick, {}).get('keys', {}).items():
             target = conf['global_if_present'] if k in SURRENDER_ALIAS else conf['global']
             target[k] = v
@@ -613,6 +647,9 @@ def catalogue():
         'swat_hp_tiers': [dict(id=t, label=SWAT_HP_TIERS[t]['label'],
                                note=SWAT_HP_TIERS[t]['note'])
                           for t in SWAT_HP_ORDER],
+        'moving_accuracy_tiers': [dict(id=t, label=MOVING_ACCURACY_TIERS[t]['label'],
+                                       note=MOVING_ACCURACY_TIERS[t]['note'])
+                                  for t in MOVING_ACCURACY_ORDER],
         'accuracy_tiers': [dict(id=t, label=ACCURACY_TIERS[t]['label'],
                                 note=ACCURACY_TIERS[t]['note'])
                            for t in ACCURACY_ORDER],

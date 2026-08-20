@@ -193,6 +193,16 @@
   </div>
 
   <div class="row">
+    <div class="label">Accuracy while moving</div>
+    <div class="hint">Suspects give up aim cone for every metre per second they are moving.
+      Vanilla sets that penalty so low it is worth about 3% at a walking pace, which is why
+      sprinting suspects still land shots. This is separate from the aim above: it only applies
+      while their feet are moving.</div>
+    <div class="seg" id="k-moving"></div>
+    <div class="segnote" id="n-moving"></div>
+  </div>
+
+  <div class="row">
     <div class="label">Suspect awareness</div>
     <div class="hint">How far they see and hear, how wide their cone of vision is, and how long
       they remember. Separate from accuracy: this decides whether they notice you at all.</div>
@@ -662,6 +672,8 @@ function render(){
   tier('k-swat', CAT.swat_tiers, () => S.swat, v => { S.swat = v; }, 'n-swat');
   tier('k-swathp', CAT.swat_hp_tiers, () => S.swat_hp,
        v => { S.swat_hp = v; }, 'n-swathp');
+  tier('k-moving', CAT.moving_accuracy_tiers, () => S.moving,
+       v => { S.moving = v; }, 'n-moving');
 
   seg(el('k-trapmode'), CAT.trap_modes, () => S.traps.mode,
       v => { S.traps.mode = v; touched(); });
@@ -797,7 +809,7 @@ function usable(saved){
   return saved && saved.suspects && typeof saved.suspects === 'object'
       && 'kind' in saved.suspects && saved.traps && saved.health && saved.surrender
       && saved.doors && saved.lesslethal && saved.awareness && saved.swat
-      && saved.swat_hp;
+      && saved.swat_hp && saved.moving;
 }
 
 async function boot(reload){

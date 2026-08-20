@@ -19,13 +19,14 @@ machine.
 
 ## The basics
 
-Twelve presets to start from, then thirteen controls, grouped by who they
+Twelve presets to start from, then fourteen controls, grouped by who they
 affect — Suspects, Civilians, SWAT, Environment:
 
 | Control | Options |
 |---|---|
 | **Suspect count** | Multiplier (0.5x–3x or custom) · Flat range (your own min/max) · MAX |
 | **Enemy accuracy** | Blind · Worse · Vanilla · Accurate · Aimbot |
+| **Accuracy while moving** | Can't run and shoot · Worse on the move · Vanilla · No penalty |
 | **Roaming suspects** | None · 0.5x · 1x · 2x · 3x · custom |
 | **Civilian count** | same three modes, plus None |
 | **Suspect health** | per-map or consistent, at 0.5x–2x or custom |
@@ -160,6 +161,24 @@ accuracy: one decides whether they notice you, the other whether they hit you.
 `MaxOpenDoorsPercentage`. Locked down puts three quarters of the level behind
 a breach and leaves nothing ajar. Keycard count is only raised, never lowered,
 since objectives can depend on the cards.
+
+**Accuracy while moving** is `SuspectAccuracyLostPerMeterSecond`: degrees of
+aim cone a suspect gives up per m/s of its *own* movement. The game's comment
+puts the average speed while shooting at ~2.3 m/s, and vanilla sets the penalty
+to 0.035–0.045 — about 3% of a 2.5° cone at that speed, which is near enough to
+nothing. That is why a sprinting suspect still hits you.
+
+| Tier | Value | Roughly |
+|---|---|---|
+| Can't run and shoot | 1.2 | doubles the cone at a walk, hopeless at a sprint |
+| Worse on the move | 0.4 | noticeably wilder while moving, still dangerous |
+| Vanilla | — | untouched |
+| No penalty | 0.0 | as accurate running as standing still |
+
+One stock map section already ships 0.3, so these are not outside what the game
+treats as sensible. Four map sections override the global value; the generator
+rewrites those in place too, so the tier applies everywhere rather than being
+quietly undone on the maps that had their own idea.
 
 **Teammate health** and **Teammate skill** are separate controls because
 wanting tanky-but-useless teammates (or the reverse) is a common ask. Health is

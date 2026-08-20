@@ -20,11 +20,12 @@ import traceback
 import webbrowser
 
 import gamedir
+import paths
 import generate
 import presets
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SETTINGS_FILE = os.path.join(HERE, 'settings.json')
+SETTINGS_FILE = paths.data_file('settings.json')
 UI_FILE = os.path.join(HERE, 'ui.html')
 
 TOKEN = secrets.token_urlsafe(24)

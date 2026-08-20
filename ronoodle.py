@@ -12,8 +12,13 @@ import os
 import shutil
 import zipfile
 
+import paths
+
 HERE = os.path.dirname(os.path.abspath(__file__))
-DLL_PATH = os.path.join(HERE, "oo2core.dll")
+# A bundled copy shipped in the zip wins; otherwise we download one into
+# whichever folder we are allowed to write to.
+_BUNDLED = os.path.join(HERE, "oo2core.dll")
+DLL_PATH = _BUNDLED if os.path.exists(_BUNDLED) else paths.data_file("oo2core.dll")
 
 _RELEASES = "https://api.github.com/repos/WorkingRobot/OodleUE/releases"
 _ASSET = "msvc-x64-release.zip"

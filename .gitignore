@@ -9,3 +9,6 @@ settings.json
 
 # Fetched on first run from the OodleUE release, not ours to redistribute.
 oo2core.dll
+
+# Built releases.
+dist/

@@ -193,6 +193,31 @@ Anywhere. It finds Ready or Not through the Steam registry and
 so is keeping the tool on your desktop. Override it under Advanced → Game
 folder if you have several installs. `Uninstall.cmd` does the same lookup.
 
+Output, downloads and your saved settings normally land next to the scripts,
+so the whole thing stays one folder you can delete in one go. If that folder
+will not take a write — unpacked into Program Files, run off a share, or
+opened straight out of an archive viewer — they go to
+`%LOCALAPPDATA%\MaxSuspectGen` instead. Nothing else is touched: no registry
+keys, no PATH, no installer.
+
+## Making a release zip
+
+`python package.py` assembles `dist\MaxSuspectGenerator-1.0.zip`: the tool,
+`oo2core.dll`, and a bundled copy of the embeddable Python runtime under
+`runtime\python\`. That zip runs on a machine with no Python at all — unpack
+it anywhere, double-click the launcher. About 11 MB.
+
+| | |
+|---|---|
+| `python package.py` | everything bundled, ~11 MB, runs on a bare PC |
+| `python package.py --no-python` | ~120 KB, needs Python 3.11+ installed |
+| `python package.py --no-oodle` | leaves the DLL to be fetched on first run |
+
+The launchers prefer `runtime\python\python.exe` when it is present and fall
+back to `py` / `python` on PATH otherwise, so the same folder works either
+way. `oo2core.dll` is the freely redistributable OodleUE build — the same one
+FModel and repak use — and is only needed to read the game's own paks.
+
 ## Notes
 
 - Disable other mods that ship `Config/Difficulties/*.ini` or `LD_*` level
@@ -225,4 +250,6 @@ build exposes; `--dry-run` reports changes without writing.
 | `uini.py` | comment-preserving Unreal `.ini` editor |
 | `ronoodle.py` | Oodle binding; fetches `oo2core.dll` on first run |
 | `gamedir.py` | Steam library detection |
+| `paths.py` | picks a writable folder for output and settings |
+| `package.py` | builds the distributable zip |
 | `out\` | `vanilla\`, `generated\`, and the built pak |

@@ -19,12 +19,15 @@ import shutil
 import sys
 import time
 
+import paths
 import ronoodle
 import ronpak
 import uini
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-OUT = os.path.join(HERE, 'out')
+# Output goes next to the tool when the folder is writable, and into
+# %LOCALAPPDATA% when it is not - see paths.py.
+OUT = paths.data_file('out')
 
 DIFF_DIR = 'ReadyOrNot/Config/Difficulties/'
 PAK_DIFF_DIR = 'Config/Difficulties/'

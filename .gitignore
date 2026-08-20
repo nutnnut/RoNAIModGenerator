@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+
+# Generated output and the working copies of the stock files.
+out/
+
+# Written by the web UI when you press Build; it holds your last settings.
+settings.json
+
+# Fetched on first run from the OodleUE release, not ours to redistribute.
+oo2core.dll

@@ -1,0 +1,875 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MAX SUSPECT Generator</title>
+<style>
+  :root{
+    --bg:#0e1013; --panel:#16191f; --panel2:#1c2027; --line:#2a2f39;
+    --ink:#e6e9ef; --dim:#98a0ae; --faint:#6b7382;
+    --accent:#e8a33d; --accent-ink:#1a1206;
+    --ok:#5bbd7a; --warn:#e0b04a; --bad:#e05c5c;
+    --radius:10px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font:15px/1.55 "Segoe UI",system-ui,-apple-system,sans-serif;
+    padding:0 0 80px;
+  }
+  a{color:var(--accent)}
+  code{font-family:Consolas,"Cascadia Mono",monospace;font-size:.92em;color:var(--dim)}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 22px}
+
+  /* Two columns where there is room for them, one where there is not.  The
+     suspect group is far taller than the rest, so it gets a column to itself
+     and everything else stacks beside it. */
+  .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(430px,1fr));
+        gap:0 22px;align-items:start}
+  .group{min-width:0}
+  .group h3{font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+            color:var(--accent);margin:22px 0 10px;font-weight:600;
+            border-bottom:1px solid var(--line);padding-bottom:7px}
+  .group h3 span{color:var(--faint);letter-spacing:0;text-transform:none;
+                 font-weight:400;font-size:12px;margin-left:8px}
+
+  header{
+    border-bottom:1px solid var(--line); background:linear-gradient(180deg,#171a20,#101317);
+    padding:26px 0 20px; margin-bottom:26px;
+  }
+  h1{margin:0;font-size:26px;letter-spacing:.08em;font-weight:700}
+  h1 span{color:var(--accent)}
+  .sub{color:var(--dim);margin-top:6px;font-size:13.5px}
+  .status{margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--ok);flex:none}
+  .dot.bad{background:var(--bad)}
+  .path{color:var(--dim);font-family:Consolas,"Cascadia Mono",monospace;font-size:12.5px;
+        overflow-wrap:anywhere}
+
+  h2{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);
+     margin:30px 0 12px;font-weight:600}
+
+  .presets{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:10px}
+  .preset{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:13px 14px;cursor:pointer;text-align:left;color:inherit;font:inherit;
+    transition:border-color .12s,background .12s;
+  }
+  .preset:hover{border-color:#3d4553;background:var(--panel2)}
+  .preset[aria-pressed="true"]{border-color:var(--accent);background:#221a0e}
+  .preset b{display:block;font-size:14.5px;margin-bottom:3px}
+  .preset small{color:var(--dim);font-size:12.5px;line-height:1.45;display:block}
+
+  .row{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+       padding:15px 16px;margin-bottom:10px}
+  .row .label{font-weight:600;font-size:14.5px;margin-bottom:2px}
+  .row .hint{color:var(--dim);font-size:12.5px;margin-bottom:11px}
+
+  .seg{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+  .seg + .seg{margin-top:8px}
+  .seg button{
+    background:var(--panel2);border:1px solid var(--line);color:var(--ink);
+    padding:7px 14px;border-radius:7px;cursor:pointer;font:inherit;font-size:13.5px;
+    transition:border-color .12s,background .12s,color .12s;
+  }
+  .seg button:hover{border-color:#4a5364}
+  .seg button[aria-pressed="true"]{
+    background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+  .seg .sep{color:var(--faint);font-size:12px;letter-spacing:.1em;text-transform:uppercase;
+            margin-right:2px}
+  .segnote{color:var(--faint);font-size:12.5px;margin-top:8px;min-height:1.35em}
+  .fields{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-top:10px}
+  .field{display:flex;flex-direction:column;gap:4px}
+  .field span{font-size:11.5px;color:var(--faint);text-transform:uppercase;letter-spacing:.09em}
+  .field input{width:110px}
+
+  .inline{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}
+  .inline > div{flex:1 1 240px;min-width:0}
+  .sublabel{font-size:12px;color:var(--faint);text-transform:uppercase;
+            letter-spacing:.1em;margin-bottom:7px}
+
+  input[type=text],input[type=number],select,textarea{
+    background:#0f1216;border:1px solid var(--line);color:var(--ink);
+    padding:7px 10px;border-radius:7px;font:inherit;font-size:13.5px;width:100%}
+  input:focus,select:focus,textarea:focus{outline:2px solid #3a4658;outline-offset:-1px}
+  label.chk{display:flex;gap:8px;align-items:center;font-size:13.5px;cursor:pointer;padding:4px 0}
+  label.chk input{width:auto}
+
+  .actions{position:sticky;bottom:0;
+    background:linear-gradient(180deg,rgba(14,16,19,0),#0e1013 22%);
+    padding:22px 0 16px;margin-top:26px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .btn{background:var(--panel2);border:1px solid var(--line);color:var(--ink);
+       padding:11px 20px;border-radius:8px;cursor:pointer;font:inherit;font-size:14.5px}
+  .btn:hover{border-color:#4a5364}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);
+               font-weight:700}
+  .btn.primary:hover{filter:brightness(1.08)}
+  .btn:disabled{opacity:.5;cursor:default}
+  .btn.danger{color:#e08a8a}
+
+  details{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+          padding:0;margin-top:12px}
+  details > summary{cursor:pointer;padding:13px 16px;font-weight:600;font-size:14px;
+    list-style:none;display:flex;justify-content:space-between;align-items:center}
+  details > summary::-webkit-details-marker{display:none}
+  details > summary::after{content:"▾";color:var(--faint);font-size:12px}
+  details[open] > summary::after{content:"▴"}
+  details > .body{padding:0 16px 16px;border-top:1px solid var(--line);padding-top:14px}
+  .adv-group{margin-bottom:20px}
+  .adv-group:last-child{margin-bottom:0}
+
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{text-align:left;color:var(--faint);font-weight:600;font-size:11.5px;text-transform:uppercase;
+     letter-spacing:.09em;padding:7px 10px;border-bottom:1px solid var(--line);
+     position:sticky;top:0;background:var(--panel)}
+  td{padding:6px 10px;border-bottom:1px solid #21252d}
+  tr:last-child td{border-bottom:none}
+  .num{font-family:Consolas,"Cascadia Mono",monospace;white-space:nowrap}
+  .was{color:var(--faint)} .now{color:var(--accent);font-weight:600} .same{color:var(--dim)}
+  .scroll{max-height:360px;overflow:auto;border:1px solid var(--line);border-radius:8px}
+
+  pre.log{margin:0;padding:12px;background:#0b0d10;border:1px solid var(--line);border-radius:8px;
+    max-height:340px;overflow:auto;font-size:12px;
+    font-family:Consolas,"Cascadia Mono",monospace;color:#b9c1cf;white-space:pre}
+
+  .note{border-radius:8px;padding:11px 13px;font-size:13.5px;margin:12px 0;
+        border:1px solid var(--line);background:var(--panel2)}
+  .note.warn{border-color:#5a4a1e;background:#221c0c;color:#e8d4a0}
+  .note.bad{border-color:#5a2626;background:#231111;color:#f0b8b8}
+  .note.ok{border-color:#26512f;background:#0f2114;color:#bfe6c9}
+
+  .kv{display:grid;grid-template-columns:1fr 1fr auto;gap:6px;margin-bottom:6px}
+  .kv button{background:none;border:1px solid var(--line);color:var(--faint);border-radius:6px;
+             cursor:pointer;padding:0 11px;font-size:15px}
+  .kv button:hover{color:var(--bad);border-color:#5a2626}
+  .muted{color:var(--faint);font-size:12.5px}
+  .spin{display:inline-block;width:13px;height:13px;border:2px solid #4a5364;
+        border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite;
+        vertical-align:-2px;margin-right:7px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  @media (max-width:620px){ .kv{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>MAX <span>SUSPECT</span> GENERATOR</h1>
+    <div class="sub">Rebuilds Ready or Not's difficulty data from whatever version you have
+      installed &mdash; new maps and DLC included, automatically.</div>
+    <div class="status" id="status"><span class="spin"></span>Looking for the game&hellip;</div>
+  </div>
+</header>
+
+<div class="wrap" id="app" hidden>
+  <div id="conflicts"></div>
+
+  <h2>Start from a preset</h2>
+  <div class="presets" id="presets"></div>
+
+  <h2>Then tune it</h2>
+
+<div class="cols">
+
+<div class="group">
+  <h3>Suspects <span>who you are fighting</span></h3>
+  <div class="row">
+    <div class="label">Suspect count</div>
+    <div class="hint">Multiplier scales what each map already has, so Hospital stays busier than
+      Gas Station. Flat range puts the same min/max on every map. MAX is one number with no
+      range at all &mdash; the game clamps it to the spawn points a map actually contains.</div>
+    <div class="seg" id="k-suspects"></div>
+    <div id="b-suspects"></div>
+    <div class="segnote" id="n-suspects"></div>
+  </div>
+
+  <div class="row">
+    <div class="label">Enemy accuracy</div>
+    <div class="hint">Adjusts the aim cone together with range falloff and how long a suspect
+      tracks you before firing &mdash; the things that actually decide whether you get hit.</div>
+    <div class="seg" id="k-accuracy"></div>
+    <div class="segnote" id="n-accuracy"></div>
+  </div>
+
+  <div class="row">
+    <div class="label">Suspect awareness</div>
+    <div class="hint">How far they see and hear, how wide their cone of vision is, and how long
+      they remember. Separate from accuracy: this decides whether they notice you at all.</div>
+    <div class="seg" id="k-awareness"></div>
+    <div class="segnote" id="n-awareness"></div>
+  </div>
+
+  <div class="row">
+    <div class="label">Roaming suspects</div>
+    <div class="hint">Roamers hunt you across the whole map instead of holding a room. Vanilla
+      allows 1&ndash;4 depending on difficulty, and a couple more changes a level completely.</div>
+    <div class="seg" id="k-roaming"></div>
+    <div class="segnote" id="n-roaming"></div>
+  </div>
+
+  <div class="row">
+    <div class="label">Suspect health</div>
+    <div class="hint">Vanilla gives most maps their own health value. Keep that variation, or
+      flatten it to one number everywhere.</div>
+    <div class="seg" id="k-hpmode"></div>
+    <div class="seg" id="k-hpmult"></div>
+    <div class="segnote" id="n-hp"></div>
+  </div>
+
+  <div class="row">
+    <div class="label">Suspects giving up</div>
+    <div class="hint">Every AI carries a hidden morale value, rolled at spawn and drained by
+      shouting, flashbangs, tasers and watching a friend go down. Low morale is what makes them
+      surrender, so this sets where they start.</div>
+    <div class="seg" id="k-give-sus"></div>
+    <div class="segnote" id="n-give-sus"></div>
+  </div>
+
+  <div class="row">
+    <div class="label">Less-lethal effectiveness</div>
+    <div class="hint">Stun health is a pool that flashbangs, tasers, beanbags and gas deplete;
+      when it empties the AI goes down. This moves the pool and every source's damage together.</div>
+    <div class="seg" id="k-lesslethal"></div>
+    <div class="segnote" id="n-lesslethal"></div>
+  </div>
+
+</div>
+
+<div class="group">
+  <h3>Civilians <span>who you are there for</span></h3>
+  <div class="row">
+    <div class="label">Civilian count</div>
+    <div class="hint">Fewer civilians means fewer judgement calls. Removing them entirely can
+      trivialise objectives that ask you to rescue them.</div>
+    <div class="seg" id="k-civilians"></div>
+    <div id="b-civilians"></div>
+    <div class="segnote" id="n-civilians"></div>
+  </div>
+
+  <div class="row">
+    <div class="label">Civilians complying</div>
+    <div class="hint">The same morale system, tuned separately. Vanilla civilians break more
+      easily than suspects do.</div>
+    <div class="seg" id="k-give-civ"></div>
+    <div class="segnote" id="n-give-civ"></div>
+  </div>
+
+
+  <h3>SWAT <span>your side of the door</span></h3>
+  <div class="row">
+    <div class="label">Teammate health</div>
+    <div class="hint">How much your AI squad can take. This is <b>SwatHealth</b>, which covers
+      the AI officers only &mdash; your own durability comes from the armour you pick, which
+      lives outside the difficulty files.</div>
+    <div class="seg" id="k-swathp"></div>
+    <div class="segnote" id="n-swathp"></div>
+  </div>
+
+  <div class="row">
+    <div class="label">Teammate skill</div>
+    <div class="hint">Aim cone, reaction time and how long they hold a target's last known
+      position. Turn it down if you want the fight to be yours, up if you are playing solo
+      against raised counts.</div>
+    <div class="seg" id="k-swat"></div>
+    <div class="segnote" id="n-swat"></div>
+  </div>
+
+
+  <h3>Environment <span>the building itself</span></h3>
+  <div class="row">
+    <div class="label">Traps</div>
+    <div class="hint">Wired doors. Only ten maps ship them in vanilla &mdash; everything else
+      inherits a global setting that pre-places none.</div>
+    <div class="seg" id="k-trapmode"></div>
+    <div class="seg" id="k-trapmult"></div>
+    <div class="segnote" id="n-trap"></div>
+  </div>
+
+  <div class="row">
+    <div class="label">Doors &amp; keycards</div>
+    <div class="hint">What fraction of the level starts locked or already open. Locking the place
+      down forces breaching tools and slows every approach.</div>
+    <div class="seg" id="k-doors"></div>
+    <div class="segnote" id="n-doors"></div>
+  </div>
+
+</div>
+
+</div>
+
+  <details id="advanced">
+    <summary>Advanced</summary>
+    <div class="body">
+
+      <div class="adv-group">
+        <div class="sublabel">Game folder</div>
+        <input type="text" id="adv-gamedir" spellcheck="false">
+        <div class="muted" style="margin-top:6px" id="adv-gamedir-hint"></div>
+      </div>
+
+      <div class="adv-group">
+        <div class="sublabel">Difficulties to rewrite</div>
+        <div id="adv-difficulties"></div>
+        <div class="muted">Each keeps its vanilla name and menu entry, which is what makes this
+          work on every map without editing map assets. Uncheck one to leave it stock.</div>
+      </div>
+
+      <div class="adv-group">
+        <div class="sublabel">Install location</div>
+        <div class="seg" id="adv-install"></div>
+        <div class="muted" style="margin-top:7px" id="adv-install-hint"></div>
+      </div>
+
+      <div class="adv-group">
+        <div class="sublabel">Pak file name</div>
+        <input type="text" id="adv-pakname" spellcheck="false">
+        <div class="muted" style="margin-top:6px">The <code>_P</code> suffix is what gives it
+          priority over the shipping paks. Keep it.</div>
+      </div>
+
+      <div class="adv-group">
+        <div class="sublabel">Spawn placement</div>
+        <div class="seg" id="adv-groups"></div>
+        <div class="muted" style="margin-top:7px" id="adv-groups-hint"></div>
+      </div>
+
+      <div class="adv-group">
+        <div class="sublabel">Trap details</div>
+        <div class="fields">
+          <label class="field"><span>Traps per map</span>
+            <input type="number" id="adv-trapbase" min="0"></label>
+          <label class="field" style="flex:1 1 260px"><span>Allowed types</span>
+            <input type="text" id="adv-traptypes" spellcheck="false"></label>
+        </div>
+        <div class="muted" style="margin-top:7px">Used by “All maps”. The game lists
+          <code>Explosive</code>, <code>Flashbang</code> and <code>Alarm</code> globally;
+          <code>ToxicGas</code> and <code>TowerAlarm</code> each appear on one map only and look
+          map-specific, so adding them everywhere is a gamble.</div>
+      </div>
+
+      <div class="adv-group">
+        <label class="chk"><input type="checkbox" id="adv-propagate">
+          Make my settings win over per-map values</label>
+        <div class="muted">Maps often redefine a global key for themselves, and the map-local
+          value wins at runtime. With this on, keys you set here are rewritten inside those map
+          sections too. Keys you did not touch keep their hand-tuned values either way.</div>
+        <div class="muted" style="margin-top:8px">Morale damage sources
+          (<code>MoraleDamageRate</code>, <code>PlayerYellMorale.Damage</code>,
+          <code>FlashMorale.Damage</code>, <code>TaserMorale.Damage</code>&hellip;) hit suspects
+          and civilians alike, so the two controls above deliberately leave them alone. Add them
+          below if you want to move both at once.</div>
+        <div class="muted" style="margin-top:8px">Structural keys such as
+          <code>SquadsEnabled</code> and <code>UseSpawnGroups</code> are best left alone:
+          forcing them on a map that ships them off can stop it spawning anyone.</div>
+      </div>
+
+      <div class="adv-group">
+        <div class="sublabel">Extra global settings</div>
+        <datalist id="global-keys"></datalist>
+        <div id="adv-global"></div>
+        <button class="btn" type="button" id="adv-global-add"
+                style="padding:6px 13px;font-size:13px">+ Add setting</button>
+        <div class="muted" style="margin-top:8px">Start typing and the box filters
+          <b id="key-count">every</b> setting, each with its category, its stock value and a
+          description. Descriptions come from community documentation of the AI options; the
+          value and whether a key is set at all come from the game you have installed. A few are
+          documented but not written by the stock file &mdash; the game still reads them.
+          Applied last, so anything here overrides the controls above.</div>
+      </div>
+
+      <div class="adv-group">
+        <div class="sublabel">Per-map overrides</div>
+        <div id="adv-map"></div>
+        <button class="btn" type="button" id="adv-map-add"
+                style="padding:6px 13px;font-size:13px">+ Add override</button>
+        <div class="muted" style="margin-top:8px">Section names come from the preview table.
+          These win over everything else.</div>
+      </div>
+
+    </div>
+  </details>
+
+  <div class="actions">
+    <button class="btn" id="btn-preview">Preview changes</button>
+    <button class="btn primary" id="btn-build">Build &amp; install</button>
+    <button class="btn danger" id="btn-uninstall">Uninstall</button>
+    <span id="busy" class="muted"></span>
+  </div>
+
+  <div id="result"></div>
+</div>
+
+<script>
+const TOKEN = "__TOKEN__";
+let CAT = null, S = null;
+
+async function api(path, body){
+  const r = await fetch(path, {
+    method: body === undefined ? 'GET' : 'POST',
+    headers: {'X-MSG-Token': TOKEN, 'Content-Type':'application/json'},
+    body: body === undefined ? undefined : JSON.stringify(body)
+  });
+  const d = await r.json().catch(()=>({error:'bad response'}));
+  if(!r.ok && !d.error) throw new Error('HTTP '+r.status);
+  return d;
+}
+const el = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c =>
+  ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const near = (a,b) => Math.abs(Number(a)-Number(b)) < 1e-9;
+function touched(){ S.preset = 'custom'; }
+
+/* Build a row of buttons into `host`. */
+function seg(host, items, get, set, leading){
+  host.innerHTML = '';
+  if(leading){
+    const s = document.createElement('span');
+    s.className = 'sep'; s.textContent = leading;
+    host.appendChild(s);
+  }
+  items.forEach(it => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = it.label;
+    b.setAttribute('aria-pressed', String(get() === it.id));
+    b.onclick = () => { set(it.id); render(); };
+    host.appendChild(b);
+  });
+}
+
+/* A multiplier strip: fixed steps plus Custom, with its own number box. */
+function multRow(host, steps, spec, onChange, opts){
+  opts = opts || {};
+  host.innerHTML = '';
+  const isStep = steps.some(m => near(m, spec.factor));
+  steps.forEach(m => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = m === 0 ? 'None' : m + 'x';
+    b.setAttribute('aria-pressed', String(isStep && near(m, spec.factor)));
+    b.onclick = () => { spec.factor = m; onChange(); render(); };
+    host.appendChild(b);
+  });
+  const cb = document.createElement('button');
+  cb.type = 'button'; cb.textContent = 'Custom';
+  cb.setAttribute('aria-pressed', String(!isStep));
+  cb.onclick = () => {
+    if(isStep){ spec.factor = Math.round(spec.factor * 100) / 100 + 0.25; }
+    onChange(); render();
+    const f = host.querySelector('input'); if(f){ f.focus(); f.select(); }
+  };
+  host.appendChild(cb);
+  if(!isStep){
+    const inp = document.createElement('input');
+    inp.type = 'number'; inp.step = '0.05'; inp.min = '0';
+    inp.max = opts.max || '20'; inp.value = spec.factor;
+    inp.style.width = '92px';
+    inp.oninput = () => { spec.factor = Number(inp.value) || 0; onChange(); };
+    host.appendChild(inp);
+    const x = document.createElement('span');
+    x.className = 'muted'; x.textContent = 'x';
+    host.appendChild(x);
+  }
+}
+
+/* Number inputs under a count row, depending on its kind. */
+function countFields(host, spec, label){
+  host.innerHTML = '';
+  if(spec.kind === 'mult' || spec.kind === 'none') return;
+  const box = document.createElement('div');
+  box.className = 'fields';
+  const add = (key, text) => {
+    const l = document.createElement('label');
+    l.className = 'field';
+    const s = document.createElement('span'); s.textContent = text;
+    const i = document.createElement('input');
+    i.type = 'number'; i.min = '0'; i.value = spec[key];
+    i.oninput = () => { spec[key] = Math.max(0, Number(i.value) || 0); touched(); warn(); };
+    l.append(s, i); box.appendChild(l);
+  };
+  if(spec.kind === 'max') add('value', label + ' per map');
+  else { add('min', 'Min per map'); add('max', 'Max per map'); }
+  host.appendChild(box);
+  const w = document.createElement('div');
+  box.after(w);
+  function warn(){
+    const v = spec.kind === 'max' ? spec.value : spec.max;
+    w.innerHTML = v > CAT.sane_ceiling
+      ? '<div class="note warn" style="margin:10px 0 0">' + v + ' is well past anything that '
+        + 'has been seen to work. Very large numbers do not produce very large firefights &mdash; '
+        + 'they make maps spawn <b>nobody at all</b>. If that happens, bring this down first.</div>'
+      : '';
+  }
+  warn();
+}
+
+function countRow(id, spec, kinds, mults, label){
+  seg(el('k-' + id), kinds, () => spec.kind, v => { spec.kind = v; touched(); });
+  const host = el('b-' + id);
+  host.innerHTML = '';
+  if(spec.kind === 'mult'){
+    const m = document.createElement('div');
+    m.className = 'seg'; host.appendChild(m);
+    multRow(m, mults, spec, touched);
+  } else {
+    const f = document.createElement('div');
+    host.appendChild(f);
+    countFields(f, spec, label);
+  }
+  const k = kinds.find(x => x.id === spec.kind);
+  el('n-' + id).textContent = k ? k.note : '';
+}
+
+/* ------------------------------------------------------------ advanced bits */
+/* Look up a key in the catalogue the server built from the installed game. */
+function keyInfo(name){
+  if(!name || !CAT.global_keys) return null;
+  const n = String(name).toLowerCase();
+  return CAT.global_keys.find(d => d.key.toLowerCase() === n) || null;
+}
+
+function describeKey(node, name, vi){
+  const info = keyInfo(name);
+  if(!info){ node.textContent = ''; node.style.display = 'none'; return; }
+  node.style.display = '';
+  const bits = [];
+  if(info.group) bits.push('<span style="color:var(--accent)">' + esc(info.group) + '</span>');
+  bits.push(info.in_file ? 'stock <b>' + esc(info.value) + '</b>'
+                         : '<i>not set by the stock file</i>');
+  // The community documentation explains what a key does; the game's own
+  // inline comment is often just a diff note against another difficulty.
+  // Show both when they say different things.
+  if(info.doc) bits.push(esc(info.doc));
+  if(info.comment && info.comment.toLowerCase() !== (info.doc || '').toLowerCase())
+    bits.push('<span style="opacity:.75">in file: ' + esc(info.comment) + '</span>');
+  node.innerHTML = bits.join(' &middot; ')
+                 + (vi && !vi.value && info.in_file ? ' <i>(click to use stock)</i>' : '');
+  node.onclick = () => { if(vi && !vi.value && info.in_file){ vi.value = info.value;
+                          vi.dispatchEvent(new Event('change')); } };
+}
+
+function kvEditor(hostId, obj, onChange, kPh, vPh){
+  const host = el(hostId); host.innerHTML = '';
+  Object.entries(obj).forEach(([k, v]) => {
+    const wrap = document.createElement('div');
+    const row = document.createElement('div'); row.className = 'kv';
+    const ki = document.createElement('input');
+    ki.type='text'; ki.value=k; ki.placeholder=kPh; ki.spellcheck=false;
+    ki.setAttribute('list','global-keys'); ki.autocomplete='off';
+    const vi = document.createElement('input');
+    vi.type='text'; vi.value=v; vi.placeholder=vPh; vi.spellcheck=false;
+    const rm = document.createElement('button'); rm.type='button'; rm.textContent='×';
+    const desc = document.createElement('div');
+    desc.className = 'muted'; desc.style.cssText='margin:-2px 0 8px;cursor:pointer';
+    ki.oninput  = () => describeKey(desc, ki.value, vi);
+    ki.onchange = () => { const o={...obj}; delete o[k]; o[ki.value]=vi.value;
+                          onChange(o); render(); };
+    vi.onchange = () => { const o={...obj}; o[k]=vi.value; onChange(o); };
+    rm.onclick  = () => { const o={...obj}; delete o[k]; onChange(o); render(); };
+    row.append(ki, vi, rm); wrap.append(row, desc); host.appendChild(wrap);
+    describeKey(desc, k, vi);
+  });
+}
+
+function mapEditor(hostId, obj, onChange){
+  const host = el(hostId); host.innerHTML = '';
+  Object.entries(obj).forEach(([section, keys]) => {
+    const box = document.createElement('div');
+    box.style.cssText = 'border:1px solid var(--line);border-radius:8px;padding:10px;'
+                      + 'margin-bottom:8px;background:#0f1216';
+    const head = document.createElement('div'); head.className = 'kv';
+    const si = document.createElement('input');
+    si.type='text'; si.value=section; si.spellcheck=false;
+    si.placeholder='RoN_Bank_BarricadedSuspects_Core'; si.style.gridColumn='span 2';
+    const rm = document.createElement('button'); rm.type='button'; rm.textContent='×';
+    rm.onclick = () => { const o={...obj}; delete o[section]; onChange(o); render(); };
+    si.onchange = () => { const o={...obj}; const v=o[section];
+                          delete o[section]; o[si.value]=v; onChange(o); render(); };
+    head.append(si, rm); box.appendChild(head);
+    Object.entries(keys).forEach(([k, v]) => {
+      const row = document.createElement('div'); row.className='kv';
+      const ki=document.createElement('input'); ki.type='text'; ki.value=k;
+      ki.placeholder='MaxSuspects'; ki.spellcheck=false;
+      ki.setAttribute('list','global-keys'); ki.autocomplete='off';
+      const vi=document.createElement('input'); vi.type='text'; vi.value=v;
+      vi.placeholder='40'; vi.spellcheck=false;
+      const kr=document.createElement('button'); kr.type='button'; kr.textContent='×';
+      ki.onchange=()=>{const o={...obj};const s={...o[section]};delete s[k];
+                       s[ki.value]=vi.value;o[section]=s;onChange(o);render();};
+      vi.onchange=()=>{const o={...obj};const s={...o[section]};s[k]=vi.value;
+                       o[section]=s;onChange(o);};
+      kr.onclick  =()=>{const o={...obj};const s={...o[section]};delete s[k];
+                       o[section]=s;onChange(o);render();};
+      row.append(ki,vi,kr); box.appendChild(row);
+    });
+    const add=document.createElement('button');
+    add.className='btn'; add.type='button'; add.textContent='+ key';
+    add.style.cssText='padding:4px 11px;font-size:12.5px';
+    add.onclick=()=>{const o={...obj};o[section]={...o[section],'':''};onChange(o);render();};
+    box.appendChild(add); host.appendChild(box);
+  });
+}
+
+/* ------------------------------------------------------------------ render */
+function render(){
+  const A = S.advanced;
+
+  document.querySelectorAll('#presets .preset').forEach(b => {
+    b.setAttribute('aria-pressed', String(b.dataset.id === S.preset));
+  });
+
+  countRow('suspects', S.suspects, CAT.count_kinds, CAT.suspect_mults, 'Suspects');
+  countRow('civilians', S.civilians, CAT.civilian_kinds, CAT.civilian_mults, 'Civilians');
+
+  seg(el('k-accuracy'), CAT.accuracy_tiers, () => S.accuracy,
+      v => { S.accuracy = v; touched(); });
+  const acc = CAT.accuracy_tiers.find(t => t.id === S.accuracy);
+  el('n-accuracy').textContent = acc ? acc.note : '';
+
+  multRow(el('k-roaming'), CAT.roaming_mults, S.roaming, touched, {max:10});
+  el('n-roaming').textContent = near(S.roaming.factor, 1) ? 'Vanilla roaming limits.'
+    : (S.roaming.factor === 0 ? 'No roamers at all — everyone holds position.'
+       : 'Vanilla limits multiplied by ' + S.roaming.factor + '.');
+
+  seg(el('k-hpmode'), CAT.hp_modes, () => S.health.mode,
+      v => { S.health.mode = v; touched(); }, 'Per map');
+  multRow(el('k-hpmult'), CAT.hp_mults, S.health, touched, {max:20});
+  const hm = CAT.hp_modes.find(m => m.id === S.health.mode);
+  el('n-hp').textContent = (near(S.health.factor,1) && S.health.mode === 'vanilla')
+    ? 'Vanilla health, untouched.'
+    : (hm ? hm.note : '') + ', at ' + S.health.factor + 'x.';
+
+  seg(el('k-give-sus'), CAT.suspect_surrender, () => S.surrender.suspects,
+      v => { S.surrender.suspects = v; touched(); });
+  const gs = CAT.suspect_surrender.find(t => t.id === S.surrender.suspects);
+  el('n-give-sus').textContent = gs ? gs.note : '';
+
+  seg(el('k-give-civ'), CAT.civilian_surrender, () => S.surrender.civilians,
+      v => { S.surrender.civilians = v; touched(); });
+  const gc = CAT.civilian_surrender.find(t => t.id === S.surrender.civilians);
+  el('n-give-civ').textContent = gc ? gc.note : '';
+
+  const tier = (host, items, get, set, note) => {
+    seg(el(host), items, get, v => { set(v); touched(); });
+    const cur = items.find(t => t.id === get());
+    el(note).textContent = cur ? cur.note : '';
+  };
+  tier('k-lesslethal', CAT.lesslethal_tiers, () => S.lesslethal,
+       v => { S.lesslethal = v; }, 'n-lesslethal');
+  tier('k-awareness', CAT.awareness_tiers, () => S.awareness,
+       v => { S.awareness = v; }, 'n-awareness');
+  tier('k-doors', CAT.door_tiers, () => S.doors, v => { S.doors = v; }, 'n-doors');
+  tier('k-swat', CAT.swat_tiers, () => S.swat, v => { S.swat = v; }, 'n-swat');
+  tier('k-swathp', CAT.swat_hp_tiers, () => S.swat_hp,
+       v => { S.swat_hp = v; }, 'n-swathp');
+
+  seg(el('k-trapmode'), CAT.trap_modes, () => S.traps.mode,
+      v => { S.traps.mode = v; touched(); });
+  const tm = CAT.trap_modes.find(m => m.id === S.traps.mode);
+  if(S.traps.mode === 'removed'){
+    el('k-trapmult').innerHTML = '';
+    el('n-trap').textContent = tm.note;
+  }else{
+    multRow(el('k-trapmult'), CAT.trap_mults, S.traps, touched, {max:10});
+    el('n-trap').textContent = tm.note
+      + (near(S.traps.factor,1) ? '' : ', counts at ' + S.traps.factor + 'x');
+  }
+
+  el('adv-gamedir').value = A.game_dir || CAT.game_dir || '';
+  el('adv-pakname').value = A.pak_name;
+  el('adv-trapbase').value = A.trap_base;
+  el('adv-traptypes').value = A.trap_types;
+  el('adv-propagate').checked = !!A.apply_global_to_map_sections;
+
+  seg(el('adv-groups'),
+      [{id:'flat', label:'Flat totals (recommended)'},
+       {id:'keep', label:'Keep vanilla spawn groups'}],
+      () => A.spawn_groups, v => { A.spawn_groups = v; });
+  el('adv-groups-hint').textContent = A.spawn_groups === 'flat'
+    ? 'Sets UseSpawnGroups = false on any map whose counts change, so the per-map total drives '
+    + 'spawning. This is how working high-count mods do it: a spawn group can only ever produce '
+    + 'as many bodies as it owns spawn points, and over-asking yields zero.'
+    : 'Leaves each map on its vanilla spawn groups and scales the per-group numbers instead. '
+    + 'Truer to vanilla placement, but it caps out quickly and can empty a map if pushed.';
+
+  const avail = CAT.difficulties_available.length ? CAT.difficulties_available
+              : CAT.defaults.advanced.difficulties;
+  el('adv-difficulties').innerHTML = '';
+  avail.forEach(name => {
+    const l = document.createElement('label'); l.className = 'chk';
+    const c = document.createElement('input');
+    c.type='checkbox'; c.checked = A.difficulties.includes(name);
+    c.onchange = () => {
+      const next = c.checked ? [...A.difficulties, name]
+                             : A.difficulties.filter(d => d !== name);
+      A.difficulties = avail.filter(d => next.includes(d));
+    };
+    l.append(c, document.createTextNode(' ' + name));
+    el('adv-difficulties').appendChild(l);
+  });
+
+  seg(el('adv-install'),
+      [{id:'paks', label:'Paks folder'}, {id:'mods', label:'~mods folder'}],
+      () => A.install_to, v => { A.install_to = v; });
+  el('adv-install-hint').textContent = A.install_to === 'paks'
+    ? 'Content\\Paks, next to the shipping paks. Remove it with Uninstall here or with '
+    + 'Uninstall.cmd.'
+    : 'Content\\Paks\\~mods\\ZZZ-MaxSuspectGen. Pick this only if a mod manager owns that '
+    + 'folder and you want it grouped with the rest.';
+
+  kvEditor('adv-global', A.global, o => { A.global = o; }, 'SwatHealth', '250.0');
+  mapEditor('adv-map', A.map, o => { A.map = o; });
+}
+
+function bindAdvanced(){
+  const A = () => S.advanced;
+  el('adv-gamedir').onchange  = e => { A().game_dir = e.target.value.trim(); boot(true); };
+  el('adv-pakname').onchange  = e => { A().pak_name = e.target.value.trim(); };
+  el('adv-trapbase').oninput  = e => { A().trap_base = Math.max(0, Number(e.target.value)||0); };
+  el('adv-traptypes').onchange= e => { A().trap_types = e.target.value; };
+  el('adv-propagate').onchange= e => { A().apply_global_to_map_sections = e.target.checked; };
+  el('adv-global-add').onclick= () => { A().global = {...A().global, '':''}; render(); };
+  el('adv-map-add').onclick   = () => { A().map = {...A().map, '': {}}; render(); };
+}
+
+function busy(on, msg){
+  el('busy').innerHTML = on ? '<span class="spin"></span>' + esc(msg || 'Working…') : '';
+  ['btn-preview','btn-build','btn-uninstall'].forEach(id => el(id).disabled = on);
+}
+
+function cell(pair){
+  if(!pair || !pair.min || !pair.max) return '<span class="muted">&mdash;</span>';
+  const b = pair.min.before === pair.max.before ? pair.min.before
+          : pair.min.before + '–' + pair.max.before;
+  const a = pair.min.after === pair.max.after ? pair.min.after
+          : pair.min.after + '–' + pair.max.after;
+  if(String(b) === String(a)) return '<span class="same">' + esc(a) + '</span>';
+  return '<span class="was">' + esc(b) + '</span> → <span class="now">' + esc(a) + '</span>';
+}
+
+function showResult(r, built){
+  if(r.error){
+    el('result').innerHTML = '<div class="note bad"><b>Something went wrong.</b>'
+      + '<pre class="log" style="margin-top:9px">' + esc(r.error) + '</pre></div>';
+    return;
+  }
+  let html = '';
+  if(built){
+    html += '<div class="note ok"><b>Installed.</b> ' + esc(r.difficulties.join(', '))
+         + ' rewritten across ' + r.map_count + ' maps. Restart the game if it is running.<br>'
+         + '<span class="muted">The difficulty menu should now show &ldquo;' + esc(r.marker)
+         + '&rdquo; as the subtitle. If it does not, the pak is not being loaded.</span></div>';
+    if(r.deployed){
+      html += '<div class="note"><span class="path">' + esc(r.deployed) + '</span>'
+           + '<button class="btn" style="padding:4px 11px;font-size:12.5px;margin-left:8px" '
+           + 'onclick="reveal(' + JSON.stringify(r.deployed).replace(/"/g,'&quot;')
+           + ')">Show in Explorer</button></div>';
+    }
+  } else {
+    html += '<div class="note"><b>Preview only.</b> Nothing was written to the game. '
+         + r.map_count + ' maps would change.</div>';
+  }
+  html += '<h2>Per-map result</h2><div class="scroll"><table><thead><tr>'
+       + '<th>Map</th><th>Suspects</th><th>Civilians</th></tr></thead><tbody>';
+  r.rows.forEach(row => {
+    html += '<tr><td>' + esc(row.map) + '</td><td class="num">' + cell(row.suspects)
+         + '</td><td class="num">' + cell(row.civilians) + '</td></tr>';
+  });
+  html += '</tbody></table></div>';
+  html += '<details style="margin-top:12px"><summary>Full change log</summary>'
+       + '<div class="body"><pre class="log">' + esc(r.log.join('\n')) + '</pre></div></details>';
+  el('result').innerHTML = html;
+  el('result').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+async function reveal(path){ await api('/api/reveal', {path}); }
+window.reveal = reveal;
+
+async function run(dry){
+  busy(true, dry ? 'Reading the game paks…' : 'Building…');
+  try{ showResult(await api(dry ? '/api/preview' : '/api/build', S), !dry); }
+  catch(e){ showResult({error:String(e)}, false); }
+  finally{ busy(false); }
+}
+
+/* -------------------------------------------------------------------- boot */
+function usable(saved){
+  return saved && saved.suspects && typeof saved.suspects === 'object'
+      && 'kind' in saved.suspects && saved.traps && saved.health && saved.surrender
+      && saved.doors && saved.lesslethal && saved.awareness && saved.swat
+      && saved.swat_hp;
+}
+
+async function boot(reload){
+  const data = await api('/api/init');
+  CAT = data;
+  if(!reload || !S){
+    const base = usable(data.saved) ? data.saved : data.defaults;
+    S = JSON.parse(JSON.stringify(base));
+    S.advanced = Object.assign({}, data.defaults.advanced, S.advanced || {});
+    if(!S.advanced.game_dir) S.advanced.game_dir = data.game_dir || '';
+  }
+
+  const st = el('status');
+  st.innerHTML = data.game_dir_ok
+    ? '<span class="dot"></span>Game found <span class="path">' + esc(data.game_dir) + '</span>'
+    : '<span class="dot bad"></span>Ready or Not not found &mdash; set the folder under Advanced.';
+
+  el('conflicts').innerHTML = (data.conflicts && data.conflicts.length)
+    ? '<div class="note warn"><b>Other mods are changing the same data.</b> These also ship '
+      + 'difficulty or level-data files and will fight this one. Disable them before testing:'
+      + '<ul style="margin:8px 0 0;padding-left:20px">'
+      + data.conflicts.map(c => '<li class="path">' + esc(c.path) + '</li>').join('')
+      + '</ul></div>' : '';
+
+  el('presets').innerHTML = '';
+  data.presets.forEach(p => {
+    const b = document.createElement('button');
+    b.className='preset'; b.type='button'; b.dataset.id=p.id;
+    b.innerHTML = '<b>' + esc(p.name) + '</b><small>' + esc(p.blurb) + '</small>';
+    b.onclick = () => {
+      const s = JSON.parse(JSON.stringify(p.settings));
+      Object.assign(S, s); S.preset = p.id; render();
+    };
+    el('presets').appendChild(b);
+  });
+
+  const dl = el('global-keys');
+  dl.innerHTML = '';
+  (data.global_keys || []).forEach(d => {
+    const o = document.createElement('option');
+    o.value = d.key;
+    o.label = (d.in_file ? d.value : '—') + '   ' + (d.doc || d.comment || '')
+            + (d.group ? '   [' + d.group + ']' : '');
+    dl.appendChild(o);
+  });
+  el('key-count').textContent = (data.global_keys || []).length
+    ? 'all ' + data.global_keys.length : 'every';
+
+  el('adv-gamedir-hint').textContent = data.game_dir_candidates.length > 1
+    ? 'Other installs found: ' + data.game_dir_candidates.slice(1).join('  |  ') : '';
+
+  el('app').hidden = false;
+  render();
+}
+
+el('btn-preview').onclick = () => run(true);
+el('btn-build').onclick   = () => run(false);
+el('btn-uninstall').onclick = async () => {
+  busy(true, 'Removing…');
+  try{
+    const r = await api('/api/uninstall', S);
+    el('result').innerHTML = (r.removed && r.removed.length)
+      ? '<div class="note ok"><b>Removed.</b><ul style="margin:8px 0 0;padding-left:20px">'
+        + r.removed.map(p => '<li class="path">' + esc(p) + '</li>').join('') + '</ul></div>'
+      : '<div class="note">Nothing of ours was installed.</div>';
+  }finally{ busy(false); }
+};
+
+bindAdvanced();
+boot().catch(e => {
+  el('status').innerHTML = '<span class="dot bad"></span>' + esc(String(e));
+});
+</script>
+</body>
+</html>

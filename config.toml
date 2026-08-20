@@ -1,0 +1,111 @@
+##############################################################################
+# Command-line config for `build.cmd` / `python generate.py`.
+#
+# The normal way to use this tool is the app: run "MAX SUSPECT Generator.cmd".
+# This file exists for scripted or headless builds and exposes the same
+# engine, one layer lower.
+##############################################################################
+
+[mod]
+pak_name = "pakchunk9999-Mods_MaxSuspect_P.pak"
+# "auto" = Content/Paks of the detected install. Or give a full path.
+deploy_to = "auto"
+# Written into DifficultySubtextKey so you can see in the difficulty menu
+# whether the game actually loaded this file.
+marker = "MaxSuspectGen: config.toml"
+
+
+[source]
+# "auto" finds the game via Steam, so this file is portable.
+game_dir = "auto"
+difficulties = ["HardDifficulty", "StandardDifficulty", "CasualDifficulty"]
+
+
+[options]
+# Maps often redefine a [Global] key for themselves, and the map-local value
+# wins at runtime. With this on, keys you set below are also rewritten inside
+# every map section that already declares them.
+apply_global_to_map_sections = true
+
+
+##############################################################################
+# Spawn counts.
+#
+#   mode = "multiply"  scale whatever each map already declares (safest: every
+#                      map keeps its own shape and is never asked for more
+#                      bodies than it was built to hold)
+#   mode = "fixed"     write absolute numbers everywhere
+#   mode = "off"       leave counts alone
+##############################################################################
+[suspects]
+mode   = "fixed"
+factor = 2.0
+# used when mode = "fixed"
+total_min = 500
+total_max = 560
+group_min = 50
+group_max = 51
+force_use_spawn_groups = true
+# optional hard ceiling applied after either mode; 0 = none
+cap = 0
+
+[civilians]
+mode = "fixed"
+factor = 1.0
+total_min = 0
+total_max = 0
+group_min = 0
+group_max = 0
+cap = 0
+
+
+##############################################################################
+# Roaming suspects. Delete `enable` or set it false to leave vanilla alone.
+##############################################################################
+[roaming]
+enable = false
+MaxRoamingSuspects  = 8
+MaxRoamingCivilians = 3
+HRMaxRoamers        = 6
+
+
+##############################################################################
+# Any key from the stock difficulty file, written into [Global].
+# `out/vanilla/HardDifficulty.ini` (produced by a build) lists them all with
+# their original explanatory comments.
+##############################################################################
+[global]
+SuspectAccuracy                         = 1.0
+ShrinkAccuracyConeAtRangeScale          = 2.5
+SuspectAccuracyLostPerTenMetersToTarget = 0.0
+SuspectAccuracyLostPerMeterSecond       = 0.01
+SuspectSightStimulusReactionTime        = 0.12
+SuspectRequiredTimeSpentOnTarget        = 0.03
+SuspectTimeWithWeaponUpBeforeFiring     = 0.05
+
+
+##############################################################################
+# Multiply an existing value instead of replacing it.
+#
+#   [global_scale]       multiply every occurrence, so per-map variation
+#                        survives (Gas keeps being tougher than Agency)
+#   [global_scale_flat]  multiply the [Global] value, then force that single
+#                        number onto every map ("consistent everywhere")
+##############################################################################
+[global_scale]
+# SuspectHealth = 1.25
+
+[global_scale_flat]
+# SuspectHealth = 1.0
+
+
+# Overrides for one difficulty file only.
+# [global_by_difficulty.CasualDifficulty]
+# SuspectAccuracy = 3.0
+
+
+# Overrides for one map only; these win over everything above.
+# Run `python generate.py --list-maps` for the exact section names.
+# [map."RoN_Bank_BarricadedSuspects_Core"]
+# MaxSuspects = 80
+# MinSuspects = 80

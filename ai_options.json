@@ -1,0 +1,1270 @@
+[
+  {
+    "name": "General AI behavior",
+    "description": "Base settings affecting suspects, civilians and friendly SWAT.",
+    "options": [
+      {
+        "key": "UseSpawnGroups",
+        "description": "See MinSuspects_GroupN and MinCivilians_GroupN options"
+      },
+      {
+        "key": "LOSConeDegrees",
+        "description": "Angle in Degrees between line traces to target when checking visibility. Both traces must be unobstructed for AI to see player."
+      },
+      {
+        "key": "VisibilityTracePairOffset",
+        "description": "Fixed offset between each trace pair, perpendicular to direction between AI and target"
+      },
+      {
+        "key": "RequiredTimeSpentOnTarget",
+        "description": "The amount of time AI must be aiming at an enemy before they can shoot (i.e. if a suspect changes targets, they must target them for 0.3 seconds before they can shoot) "
+      },
+      {
+        "key": "BoneRetargetingRate",
+        "description": "The amount of time in seconds until retargeting to another bone in the current zone."
+      },
+      {
+        "key": "EngagementTimeUntilReachedLastBoneZone",
+        "description": "The amount of time in seconds it takes to reach the last bone target zone while engaging an enemy."
+      },
+      {
+        "key": "HideActionSearchExtent",
+        "description": "Custom extent to search for cover landmarks when using the hide action."
+      },
+      {
+        "key": "CoverSearchExtent",
+        "description": "Maximum distance to look for cover in centimeters."
+      },
+      {
+        "key": "CoverLandmarkSearchExtent",
+        "description": "Maximum distance to look for cover landmarks in centimeters."
+      },
+      {
+        "key": "CoverSearchExclusionRadiusAroundInstigator",
+        "description": "Exclude all cover points within the specified radius around the instigator in centimeters."
+      },
+      {
+        "key": "MaxDoorInteractionDistance",
+        "description": "Maximum distance for AI to interact with doors in centimeters."
+      },
+      {
+        "key": "MinFlees",
+        "description": "Minimum number of AI who will flee the room when they spot a player."
+      },
+      {
+        "key": "MaxFlees",
+        "description": "Maximum number of AI who will flee the room when they spot a player."
+      }
+    ]
+  },
+  {
+    "name": "Suspects",
+    "description": "These options only apply to AI suspects.",
+    "options": [
+      {
+        "key": "DamageCap",
+        "description": "Limits the amount of damage per hit."
+      },
+      {
+        "key": "SuspectHealth",
+        "description": "Suspect health"
+      },
+      {
+        "key": "MaxWorldBuildingActivities",
+        "description": null
+      },
+      {
+        "key": "SuspectChanceToSpawnWithNoWeapon",
+        "description": "If suspect has no weapon then weapon will be drawn after fleeing and breaking LOS or by fake surrendering"
+      },
+      {
+        "key": "TimeBetweenIdleLines",
+        "description": "Time between playing idle conversation lines"
+      },
+      {
+        "key": "ChanceToPlayVoicelineWhenHeardSwat",
+        "description": null
+      },
+      {
+        "key": "ChanceToMisfireGunWhenStartled",
+        "description": null
+      },
+      {
+        "key": "CoverLandmarkExitChanceOnYell",
+        "description": null
+      },
+      {
+        "key": "PerpetualCoverFireTime",
+        "description": null
+      },
+      {
+        "key": "SuspectGlobalFlankCooldown",
+        "description": "How long to cooldown all flank combat moves when initiated "
+      },
+      {
+        "key": "SuspectGlobalInvestigationCooldown",
+        "description": "How long to cooldown all investigations when initiated"
+      },
+      {
+        "key": "SuspectGlobalPushCooldown",
+        "description": "How long to cooldown all push combat moves when initiated "
+      },
+      {
+        "key": "TimeToFireAtDoorAfterKick",
+        "description": "Time for suspects to target a door after being kicked in seconds."
+      },
+      {
+        "key": "SuspectRequiredTimeSpentOnTarget",
+        "description": "The amount of time AI must be aiming at an enemy before they can shoot (i.e. if a suspect changes targets, they must target them for 0.3 seconds before they can shoot) "
+      },
+      {
+        "key": "SuspectWeaponSwitchCooldown",
+        "description": "Time until AI is allowed to switch weapon again after switching"
+      },
+      {
+        "key": "SuspectTimeWithWeaponUpBeforeFiring",
+        "description": "A value in seconds"
+      },
+      {
+        "key": "SuspectEngagementTimeResetOnLOSLossTime",
+        "description": "After losing LOS on current target for this time, the engagement timer resets. NOTE, as TargetingComp ticks at 1/sec, the time is this value + [0, 1] seconds"
+      },
+      {
+        "key": "SuspectAccuracy",
+        "description": "Suspect accuracy in degrees (0.0 = Perfectly Accurate, 5+ = Can't really hit anything beyond 10m)"
+      },
+      {
+        "key": "SuspectAccuracyLostPerMeter",
+        "description": "Value of 0.1 will lose 1 degree of accuracy every 10m (which is a lot).. don't tune this higher than ~0.1."
+      },
+      {
+        "key": "SuspectAccuracyLostPerTenMetersToTarget",
+        "description": "Value of 1.0 will lose 1 degree of accuracy every 10m (which is a lot).. don't tune this higher than ~0.1."
+      },
+      {
+        "key": "SuspectAccuracyLostPerMeterSecond",
+        "description": "Accuracy loss per m/s of movement speed (avg. speed when shooting is around ~2.3 m/s)"
+      },
+      {
+        "key": "ShrinkAccuracyConeAtRangeScale",
+        "description": "How much to scale the accuracy cone over distance, so that it linearly scales (ie. Value of 1 = 10m = 5 Degree Cone, 20m = 2.5 Degree cone, 30m = 1.25 Degree cone) and so on "
+      },
+      {
+        "key": "SuspectExplosiveVestAccuracy",
+        "description": "Shooting accuracy of suspects wearing an exlposive vest. The higher the value, the lower the accuracy."
+      },
+      {
+        "key": "GasVisibilityAccuracyPenaltyPerMeter",
+        "description": null
+      },
+      {
+        "key": "GasVisibilityBlockingThreshold",
+        "description": null
+      },
+      {
+        "key": "HostageTakeAccuracyNerf",
+        "description": null
+      },
+      {
+        "key": "SuspectDefaultFireRate",
+        "description": "Default fire rate if we don't find it in the weapon look up. (in seconds)"
+      },
+      {
+        "key": "SuspectRifleFireRate",
+        "description": "Rifle fire rate for suspects."
+      },
+      {
+        "key": "SuspectRifleFireRateDeviation",
+        "description": null
+      },
+      {
+        "key": "SuspectSMGFireRate",
+        "description": "SMG fire rate for suspects."
+      },
+      {
+        "key": "SuspectSMGFireRateDeviation",
+        "description": null
+      },
+      {
+        "key": "SuspectLMGFireRate",
+        "description": "LMG fire rate for suspects."
+      },
+      {
+        "key": "SuspectLMGFireRateDeviation",
+        "description": null
+      },
+      {
+        "key": "SuspectPistolFireRate",
+        "description": "Pistol fire rate for suspects."
+      },
+      {
+        "key": "SuspectPistolFireRateDeviation",
+        "description": null
+      },
+      {
+        "key": "SuspectShotgunFireRate",
+        "description": "Shotgun fire rate for suspects."
+      },
+      {
+        "key": "SuspectShotgunFireRateDeviation",
+        "description": null
+      }
+    ]
+  },
+  {
+    "name": "Suspect perception",
+    "description": "Sight, hearing, reaction time, and stress",
+    "options": [
+      {
+        "key": "SightDetectionAccuracy",
+        "description": "How accurate can the AI sight detect the players extremities (limbs). 1.0 = Fully accurate, can see hands/legs/feet more easily. 0.0 = Regular accuracy, can not see the players limbs, only the torso"
+      },
+      {
+        "key": "SuspectCoverEvaluationCooldown",
+        "description": "Suspects will trigger an evaluation event every {value} seconds to peek behind covers in order to check if there's any SWAT. If not, they will leave the cover"
+      },
+      {
+        "key": "SuspectTrackLastKnownPositionTime",
+        "description": "How long to watch the target's last known position after losing sight of them"
+      },
+      {
+        "key": "UnalertedPerceptionHalfAngle",
+        "description": "Unalerted perception half angle (90 half angle = 180 degrees of vision)"
+      },
+      {
+        "key": "AlertedPerceptionHalfAngle",
+        "description": "Alerted perception half angle (160 half angle = 320 degrees of vision)"
+      },
+      {
+        "key": "UnalertedSightRange",
+        "description": "Range (in cm) that an unalerted enemy can potentially spot SWAT"
+      },
+      {
+        "key": "AlertedSightRange",
+        "description": "Range (in cm) that an alerted enemy can potentially spot SWAT"
+      },
+      {
+        "key": "DoorStimulusReactionTime",
+        "description": "Reaction time to door stimulus in seconds."
+      },
+      {
+        "key": "FlashlightPerceptionRange",
+        "description": "Maximum range to perceive flashlights in centimeters. If flashlight goes beyond the specified range, forget the flashlight."
+      },
+      {
+        "key": "FlashlightSeenReactionTime",
+        "description": "Reaction time in seconds to react to percieved flashlight."
+      },
+      {
+        "key": "FlashlightForgetTime",
+        "description": "Time to forget the flashlight after not seeing it in seconds."
+      },
+      {
+        "key": "DoorKickHearingRange",
+        "description": null
+      },
+      {
+        "key": "GunShotHearingRange",
+        "description": "Maximum range to perceive gunshots in centimeters."
+      },
+      {
+        "key": "GunShotReactionTime",
+        "description": "Reaction time in seconds to react to gunshots."
+      },
+      {
+        "key": "GunShotForgetTime",
+        "description": "The amount of time in seconds until suspects forget gunshots"
+      },
+      {
+        "key": "GeneralExplosionReactionTime",
+        "description": "Reaction time in seconds to react to an explosion of any kind (excluding grenade detonations)"
+      },
+      {
+        "key": "GrenadePerceptionRange",
+        "description": "Maximum range to perceive grenades in centimeters"
+      },
+      {
+        "key": "GrenadeSeenReactionTime",
+        "description": "Reaction time after seeing a thrown grenade in seconds."
+      },
+      {
+        "key": "GrenadeHeardReactionTime",
+        "description": "Reaction time after hearing a thrown grenade in seconds."
+      },
+      {
+        "key": "GrenadeDetonateReactionTime",
+        "description": "Reaction time after hearing a grenade detonation in seconds."
+      },
+      {
+        "key": "GrenadeForgetTime",
+        "description": "Time to forget the grenade after not sensing it anymore in seconds."
+      },
+      {
+        "key": "SuspectAlertReactionTimeMultiplier",
+        "description": "A multiplier value from 0.0 to 1.0. A value of 0.5 means reaction time of any stimulus will be halved when in the alerted state (reacting 50% faster than the base stimulus reaction time)"
+      },
+      {
+        "key": "SuspectDamageStimulusReactionTime",
+        "description": null
+      },
+      {
+        "key": "SuspectSightStimulusReactionTime",
+        "description": null
+      },
+      {
+        "key": "SuspectSightReactionTimeIncreasePerTwentyMeters",
+        "description": null
+      },
+      {
+        "key": "SuspectSoundStimulusReactionTime",
+        "description": null
+      },
+      {
+        "key": "SuspiciousSightRange",
+        "description": "Suspicious Sight Range (Unalerted = Has heard noises but hasn't spotted a swat officer)"
+      },
+      {
+        "key": "SuspectSuspiciousReactionTimeMultiplier",
+        "description": null
+      },
+      {
+        "key": "SuspectStartleAtSightOfEnemyChance",
+        "description": null
+      },
+      {
+        "key": "SuspectStartingStress",
+        "description": "AI stress will naturally decrease or increase depending on how aggressive your team is. AI in high stress will not hesitate to shoot you and be combative, while AI in low stress will not be as aggressive."
+      },
+      {
+        "key": "DamageStress",
+        "description": null
+      },
+      {
+        "key": "DoorKickStress",
+        "description": null
+      },
+      {
+        "key": "FriendlyKilledStress",
+        "description": null
+      },
+      {
+        "key": "GunshotStress",
+        "description": null
+      },
+      {
+        "key": "NoEquippedWeaponStress",
+        "description": null
+      },
+      {
+        "key": "PlayerADSStress",
+        "description": null
+      },
+      {
+        "key": "StressUntilWeaponRaise",
+        "description": null
+      },
+      {
+        "key": "StunStress",
+        "description": null
+      },
+      {
+        "key": "SuppressedGunshotStress",
+        "description": null
+      },
+      {
+        "key": "SquadMemberKilledStress",
+        "description": null
+      }
+    ]
+  },
+  {
+    "name": "Stun behavior",
+    "description": "AI will be stunned when their stun health reaches 0",
+    "options": [
+      {
+        "key": "StunHealth",
+        "description": "Stun health, when it reaches 0, AI will be stunned."
+      },
+      {
+        "key": "BeanbagStunDuration",
+        "description": "How long the AI is stunned for by beanbags in seconds."
+      },
+      {
+        "key": "AIStunDuration",
+        "description": "How long the AI is stunned for in seconds."
+      },
+      {
+        "key": "RubberballStunDamage",
+        "description": null
+      },
+      {
+        "key": "GrenadeStunDamage",
+        "description": "Stun damage dealt by grenades."
+      },
+      {
+        "key": "BeanbagShotgunStunDamage",
+        "description": "Stun damage dealt by beanbag shotguns."
+      },
+      {
+        "key": "PepperballStunDamage",
+        "description": "Stun damage dealt by pepperballs."
+      },
+      {
+        "key": "TaserStunDamage",
+        "description": "Stun damage dealt by tasers."
+      },
+      {
+        "key": "NineBangerAccuracyPenalty",
+        "description": "Accuracy penalty applied per ninebanger bang, up to 4x "
+      },
+      {
+        "key": "AccuracyPenaltyRecovery",
+        "description": "Accuracy penalty recovery per second."
+      },
+      {
+        "key": "PepperSprayAccuracyPenalty",
+        "description": null
+      },
+      {
+        "key": "PepperSprayAccuracyPenaltyRecovery",
+        "description": null
+      }
+    ]
+  },
+  {
+    "name": "Suspect hesitation and surrender behavior",
+    "description": "",
+    "options": [
+      {
+        "key": "SuspectKnifeFakeForwardChance",
+        "description": "The chance that a suspect who surrendered with knife will try to stab SWAT if they get close enough (1.0 = 100%)"
+      },
+      {
+        "key": "ChanceToSurrenderWithItem",
+        "description": null
+      },
+      {
+        "key": "ChanceToFakeSurrenderWhenOrderedToTurnAround",
+        "description": null
+      },
+      {
+        "key": "PlayDeadChance",
+        "description": null
+      },
+      {
+        "key": "SuicideChance",
+        "description": null
+      },
+      {
+        "key": "HesitationChanceArmed",
+        "description": null
+      },
+      {
+        "key": "HesitationTimeArmed",
+        "description": null
+      },
+      {
+        "key": "HesitationTimeUnarmed",
+        "description": null
+      }
+    ]
+  },
+  {
+    "name": "Suspect count",
+    "description": null,
+    "options": [
+      {
+        "key": "MaxRoamers",
+        "description": "Maximum number of roamers (AI that move around searching for SWAT) in all game modes"
+      },
+      {
+        "key": "MinMeleeSuspects",
+        "description": "Minimum number of melee suspects"
+      },
+      {
+        "key": "MaxMeleeSuspects",
+        "description": "Maximum number of melee suspects"
+      },
+      {
+        "key": "MinExplosiveVestSuspects",
+        "description": "Minimum number of suspects with explosive vests"
+      },
+      {
+        "key": "MaxExplosiveVestSuspects",
+        "description": "Maximum number of suspects with explosive vests"
+      },
+      {
+        "key": "MinSuspects",
+        "description": "Minimum number of suspects"
+      },
+      {
+        "key": "MinSuspects_Group0",
+        "description": "Minimum number of suspects in group 0"
+      },
+      {
+        "key": "MinSuspects_Group1",
+        "description": "Minimum number of suspects in group 1"
+      },
+      {
+        "key": "MinSuspects_Group2",
+        "description": "Minimum number of suspects in group 2"
+      },
+      {
+        "key": "MinSuspects_Group3",
+        "description": "Minimum number of suspects in group 3"
+      },
+      {
+        "key": "MinSuspects_Group4",
+        "description": "Minimum number of suspects in group 4"
+      },
+      {
+        "key": "MinSuspects_Group5",
+        "description": "Minimum number of suspects in group 5"
+      },
+      {
+        "key": "MinSuspects_Group6",
+        "description": "Minimum number of suspects in group 6"
+      },
+      {
+        "key": "MinSuspects_Group7",
+        "description": "Minimum number of suspects in group 7"
+      },
+      {
+        "key": "MinSuspects_Group8",
+        "description": "Minimum number of suspects in group 8"
+      },
+      {
+        "key": "MinSuspects_Group9",
+        "description": "Minimum number of suspects in group 9"
+      },
+      {
+        "key": "MinSuspects_Group10",
+        "description": "Minimum number of suspects in group 10"
+      },
+      {
+        "key": "MinSuspects_Group11",
+        "description": "Minimum number of suspects in group 11"
+      },
+      {
+        "key": "MinSuspects_Group12",
+        "description": "Minimum number of suspects in group 12"
+      },
+      {
+        "key": "MinSuspects_Group13",
+        "description": "Minimum number of suspects in group 13"
+      },
+      {
+        "key": "MinSuspects_Group14",
+        "description": "Minimum number of suspects in group 14"
+      },
+      {
+        "key": "MinSuspects_Group15",
+        "description": "Minimum number of suspects in group 15"
+      },
+      {
+        "key": "MaxSuspects",
+        "description": "Maximum number of suspects "
+      },
+      {
+        "key": "MaxSuspects_Group0",
+        "description": "Maximum number of suspects in group 0"
+      },
+      {
+        "key": "MaxSuspects_Group1",
+        "description": "Maximum number of suspects in group 1"
+      },
+      {
+        "key": "MaxSuspects_Group2",
+        "description": "Maximum number of suspects in group 2"
+      },
+      {
+        "key": "MaxSuspects_Group3",
+        "description": "Maximum number of suspects in group 3"
+      },
+      {
+        "key": "MaxSuspects_Group4",
+        "description": "Maximum number of suspects in group 4"
+      },
+      {
+        "key": "MaxSuspects_Group5",
+        "description": "Maximum number of suspects in group 5"
+      },
+      {
+        "key": "MaxSuspects_Group6",
+        "description": "Maximum number of suspects in group 6"
+      },
+      {
+        "key": "MaxSuspects_Group7",
+        "description": "Maximum number of suspects in group 7"
+      },
+      {
+        "key": "MaxSuspects_Group8",
+        "description": "Maximum number of suspects in group 8"
+      },
+      {
+        "key": "MaxSuspects_Group9",
+        "description": "Maximum number of suspects in group 9"
+      },
+      {
+        "key": "MaxSuspects_Group10",
+        "description": "Maximum number of suspects in group 10"
+      },
+      {
+        "key": "MaxSuspects_Group11",
+        "description": "Maximum number of suspects in group 11"
+      },
+      {
+        "key": "MaxSuspects_Group12",
+        "description": "Maximum number of suspects in group 12"
+      },
+      {
+        "key": "MaxSuspects_Group13",
+        "description": "Maximum number of suspects in group 13"
+      },
+      {
+        "key": "MaxSuspects_Group14",
+        "description": "Maximum number of suspects in group 14"
+      },
+      {
+        "key": "MaxSuspects_Group15",
+        "description": "Maximum number of suspects in group 15"
+      }
+    ]
+  },
+  {
+    "name": "Traps, doors & keycards",
+    "description": "",
+    "options": [
+      {
+        "key": "MaxTraps",
+        "description": "Maximum number of traps that should exist in a level, including both pre-placed and suspect-placed."
+      },
+      {
+        "key": "MinTrapsPrePlaced",
+        "description": "Minimum number of traps pre-placed before the game starts."
+      },
+      {
+        "key": "MaxTrapsPrePlaced",
+        "description": "Maximum number of traps pre-placed before the game starts."
+      },
+      {
+        "key": "MaxTrapsPlaceable",
+        "description": "Maximum number of traps suspects can place in total."
+      },
+      {
+        "key": "MaxTrapsSuspectCanPlace",
+        "description": "Maximum number of traps a single suspect can place during gameplay."
+      },
+      {
+        "key": "PrePlaceTrapsNearAISpawns",
+        "description": "Should pre-placed traps spawn closer to AI spawns (0=No or 1=Yes)"
+      },
+      {
+        "key": "PrePlaceTrapsNearAISpawnChance",
+        "description": "When spawning near AI, chance for given door to get a trap (0.52 = 52%)"
+      },
+      {
+        "key": "MaxLockedDoorsPercentage",
+        "description": "Percentage of locked doors in the level (0.225 = 22.5%)"
+      },
+      {
+        "key": "MaxOpenDoorsPercentage",
+        "description": "Percentage of open doors in the level (0.075 = 7.5%)"
+      },
+      {
+        "key": "MaxKeycards",
+        "description": "Maximum number of keycards allowed to spawn"
+      }
+    ]
+  },
+  {
+    "name": "Suspect & Civilian Morale",
+    "description": "Morale is a value from 0.0 to 1.0. Suspects and civilians suffer negative effects below certain thresholds and surrender when morale reaches 0 and they're shouted at by SWAT.",
+    "options": [
+      {
+        "key": "MinMorale",
+        "description": "Minimum morale"
+      },
+      {
+        "key": "MaxMorale",
+        "description": "Maximum morale"
+      },
+      {
+        "key": "SuspectMinMorale",
+        "description": "Minimum suspect morale."
+      },
+      {
+        "key": "SuspectMaxMorale",
+        "description": "Maximum suspect morale."
+      },
+      {
+        "key": "CivilianMinMorale",
+        "description": "Minimum civilian morale."
+      },
+      {
+        "key": "CivilianMaxMorale",
+        "description": "Maximum civilian morale."
+      },
+      {
+        "key": "CivilianNonCompliantMorale.Gain",
+        "description": null
+      },
+      {
+        "key": "SuspectFriendlySpottedMorale.Gain",
+        "description": null
+      },
+      {
+        "key": "MaximumDoorBreachesImpactingMorale",
+        "description": null
+      },
+      {
+        "key": "RepeatBreachDamageFactor",
+        "description": null
+      },
+      {
+        "key": "AIKilledMorale.Damage",
+        "description": null
+      },
+      {
+        "key": "AIKilledMorale.DamageInnerRadius",
+        "description": null
+      },
+      {
+        "key": "AIKilledMorale.DamageOuterRadius",
+        "description": null
+      },
+      {
+        "key": "BatteringRamMorale.Damage",
+        "description": null
+      },
+      {
+        "key": "BatteringRamMorale.DamageInnerRadius",
+        "description": null
+      },
+      {
+        "key": "BatteringRamMorale.DamageOuterRadius",
+        "description": null
+      },
+      {
+        "key": "BreachingShotgunMorale.Damage",
+        "description": null
+      },
+      {
+        "key": "BreachingShotgunMorale.DamageInnerRadius",
+        "description": null
+      },
+      {
+        "key": "BreachingShotgunMorale.DamageOuterRadius",
+        "description": null
+      },
+      {
+        "key": "BashMorale.Damage",
+        "description": "Change in morale when the AI is bashed (melee)"
+      },
+      {
+        "key": "BeanbagShotgunMorale.Damage",
+        "description": "Change in morale when the AI is hit by a beanbag shotgun."
+      },
+      {
+        "key": "C2DetonateMorale.Damage",
+        "description": "Change in morale when the door is breached using C2."
+      },
+      {
+        "key": "C2DetonateMorale.DamageInnerRadius",
+        "description": null
+      },
+      {
+        "key": "C2DetonateMorale.DamageOuterRadius",
+        "description": null
+      },
+      {
+        "key": "GrenadeDetonateMorale.Damage",
+        "description": "Change in morale when a grenade is detonated."
+      },
+      {
+        "key": "GrenadeDetonateMorale.DamageInnerRadius",
+        "description": null
+      },
+      {
+        "key": "GrenadeDetonateMorale.DamageOuterRadius",
+        "description": null
+      },
+      {
+        "key": "KickDoorMorale.Damage",
+        "description": "Change in morale when the door is kicked."
+      },
+      {
+        "key": "KickDoorMorale.DamageInnerRadius",
+        "description": null
+      },
+      {
+        "key": "KickDoorMorale.DamageOuterRadius",
+        "description": null
+      },
+      {
+        "key": "KickDoorMorale.SuccessMultiplier",
+        "description": null
+      },
+      {
+        "key": "FireWeaponMorale.Damage",
+        "description": null
+      },
+      {
+        "key": "FireWeaponMorale.DamageInnerRadius",
+        "description": null
+      },
+      {
+        "key": "FireWeaponMorale.DamageOuterRadius",
+        "description": null
+      },
+      {
+        "key": "FireWeaponMorale.Gain",
+        "description": "Amount of morale gained per shot of firing a weapon "
+      },
+      {
+        "key": "PepperballMorale.Damage",
+        "description": "Change in morale when the AI is hit by a pepperball."
+      },
+      {
+        "key": "PeppersprayMorale.Damage",
+        "description": "Change in morale per second of getting sprayed."
+      },
+      {
+        "key": "TaserMorale.Damage",
+        "description": "Change in morale when the AI is tased."
+      },
+      {
+        "key": "SuppressionMorale.Damage",
+        "description": null
+      },
+      {
+        "key": "SuspectMoraleLowReload",
+        "description": "Use slow reload speed when morale goes below this value."
+      },
+      {
+        "key": "SuspectMoraleMediumReload",
+        "description": "Use medium reload speed when morale goes below this value."
+      },
+      {
+        "key": "SuspectNonCompliantMorale.Gain",
+        "description": null
+      }
+    ]
+  },
+  {
+    "name": "Civilians",
+    "description": "",
+    "options": [
+      {
+        "key": "CivilianHealth",
+        "description": "Civilian health."
+      },
+      {
+        "key": "CivilianAlertReactionTimeMultiplier",
+        "description": "A multiplier value from 0.0 to 1.0. A value of 0.5 means reaction time of any stimulus will be halved when in the alerted state (reacting 50% faster than the base stimulus reaction time)"
+      },
+      {
+        "key": "CivilianDamageStimulusReactionTime",
+        "description": null
+      },
+      {
+        "key": "CivilianSightStimulusReactionTime",
+        "description": null
+      },
+      {
+        "key": "CivilianSoundStimulusReactionTime",
+        "description": null
+      }
+    ]
+  },
+  {
+    "name": "Civilian count",
+    "description": null,
+    "options": [
+      {
+        "key": "MinExplosiveVestCivilians",
+        "description": "Minimum number of civilians with explosive vests"
+      },
+      {
+        "key": "MaxExplosiveVestCivilians",
+        "description": "Maximum number of civilians with explosive vests"
+      },
+      {
+        "key": "MinCivilians",
+        "description": "Minimum number of civilians."
+      },
+      {
+        "key": "MinCivilians_Group0",
+        "description": "Minimum number of civilians in group 0"
+      },
+      {
+        "key": "MinCivilians_Group1",
+        "description": "Minimum number of civilians in group 1"
+      },
+      {
+        "key": "MinCivilians_Group2",
+        "description": "Minimum number of civilians in group 2"
+      },
+      {
+        "key": "MinCivilians_Group3",
+        "description": "Minimum number of civilians in group 3"
+      },
+      {
+        "key": "MinCivilians_Group4",
+        "description": "Minimum number of civilians in group 4"
+      },
+      {
+        "key": "MinCivilians_Group5",
+        "description": "Minimum number of civilians in group 5"
+      },
+      {
+        "key": "MinCivilians_Group6",
+        "description": "Minimum number of civilians in group 6"
+      },
+      {
+        "key": "MinCivilians_Group7",
+        "description": "Minimum number of civilians in group 7"
+      },
+      {
+        "key": "MinCivilians_Group8",
+        "description": "Minimum number of civilians in group 8"
+      },
+      {
+        "key": "MinCivilians_Group9",
+        "description": "Minimum number of civilians in group 9"
+      },
+      {
+        "key": "MinCivilians_Group10",
+        "description": "Minimum number of civilians in group 10"
+      },
+      {
+        "key": "MinCivilians_Group11",
+        "description": "Minimum number of civilians in group 11"
+      },
+      {
+        "key": "MinCivilians_Group12",
+        "description": "Minimum number of civilians in group 12"
+      },
+      {
+        "key": "MinCivilians_Group13",
+        "description": "Minimum number of civilians in group 13"
+      },
+      {
+        "key": "MinCivilians_Group14",
+        "description": "Minimum number of civilians in group 14"
+      },
+      {
+        "key": "MinCivilians_Group15",
+        "description": "Minimum number of civilians in group 15"
+      },
+      {
+        "key": "MaxCivilians",
+        "description": "Maximum number of civilians."
+      },
+      {
+        "key": "MaxCivilians_Group0",
+        "description": "Maximum number of civilians in group 0"
+      },
+      {
+        "key": "MaxCivilians_Group1",
+        "description": "Maximum number of civilians in group 1"
+      },
+      {
+        "key": "MaxCivilians_Group2",
+        "description": "Maximum number of civilians in group 2"
+      },
+      {
+        "key": "MaxCivilians_Group3",
+        "description": "Maximum number of civilians in group 3"
+      },
+      {
+        "key": "MaxCivilians_Group4",
+        "description": "Maximum number of civilians in group 4"
+      },
+      {
+        "key": "MaxCivilians_Group5",
+        "description": "Maximum number of civilians in group 5"
+      },
+      {
+        "key": "MaxCivilians_Group6",
+        "description": "Maximum number of civilians in group 6"
+      },
+      {
+        "key": "MaxCivilians_Group7",
+        "description": "Maximum number of civilians in group 7"
+      },
+      {
+        "key": "MaxCivilians_Group8",
+        "description": "Maximum number of civilians in group 8"
+      },
+      {
+        "key": "MaxCivilians_Group9",
+        "description": "Maximum number of civilians in group 9"
+      },
+      {
+        "key": "MaxCivilians_Group10",
+        "description": "Maximum number of civilians in group 10"
+      },
+      {
+        "key": "MaxCivilians_Group11",
+        "description": "Maximum number of civilians in group 11"
+      },
+      {
+        "key": "MaxCivilians_Group12",
+        "description": "Maximum number of civilians in group 12"
+      },
+      {
+        "key": "MaxCivilians_Group13",
+        "description": "Maximum number of civilians in group 13"
+      },
+      {
+        "key": "MaxCivilians_Group14",
+        "description": "Maximum number of civilians in group 14"
+      },
+      {
+        "key": "MaxCivilians_Group15",
+        "description": "Maximum number of civilians in group 15"
+      }
+    ]
+  },
+  {
+    "name": "SWAT",
+    "description": "",
+    "options": [
+      {
+        "key": "SwatHealth",
+        "description": "SWAT health"
+      },
+      {
+        "key": "SWATAlertReactionTimeMultiplier",
+        "description": null
+      },
+      {
+        "key": "SWATDamageStimulusReactionTime",
+        "description": null
+      },
+      {
+        "key": "SWATSightStimulusReactionTime",
+        "description": null
+      },
+      {
+        "key": "SWATSoundStimulusReactionTime",
+        "description": null
+      },
+      {
+        "key": "SwatSightReactionTimeIncreasePerTwentyMeters",
+        "description": null
+      },
+      {
+        "key": "SwatTimeWithWeaponUpBeforeFiring",
+        "description": "A value in seconds"
+      },
+      {
+        "key": "SWATRequiredTimeSpentOnTarget",
+        "description": "The amount of time AI must be aiming at an enemy before they can shoot"
+      },
+      {
+        "key": "SwatAccuracy",
+        "description": "SWAT accuracy in degrees (0.0 = Perfectly Accurate, 5+ = Can't really hit anything beyond 10m)"
+      },
+      {
+        "key": "SwatAccuracyLostPerMeter",
+        "description": "Value of 0.1 will lose 1 degree of accuracy every 10m (which is a lot).. don't tune this higher than ~0.1."
+      },
+      {
+        "key": "SwatCoverEvaluationCooldown",
+        "description": "Time between cover evaluations in seconds."
+      },
+      {
+        "key": "SwatTrackLastKnownPositionTime",
+        "description": "How long to watch the target's last known position after losing sight of them."
+      },
+      {
+        "key": "SwatAccuracyLostPerMeterSecond",
+        "description": null
+      },
+      {
+        "key": "SwatAccuracyLostPerTenMetersToTarget",
+        "description": null
+      },
+      {
+        "key": "SwatSemiAutoDistanceStart",
+        "description": "Distance SWAT should start to transition to full auto."
+      },
+      {
+        "key": "SwatPistolFireRate",
+        "description": "Pistol fire rate for SWAT."
+      },
+      {
+        "key": "SwatPistolFireRateDeviation",
+        "description": null
+      },
+      {
+        "key": "SwatShotgunFireRate",
+        "description": "Shotgun fire rate for SWAT."
+      },
+      {
+        "key": "SwatShotgunFireRateDeviation",
+        "description": null
+      },
+      {
+        "key": "SwatDefaultSemiFireRateMultiplierStart",
+        "description": null
+      },
+      {
+        "key": "SwatDefaultSemiFireRateMultiplierEnd",
+        "description": null
+      },
+      {
+        "key": "SwatLMGSemiFireRateMultiplierStart",
+        "description": null
+      },
+      {
+        "key": "SwatLMGSemiFireRateMultiplierEnd",
+        "description": null
+      },
+      {
+        "key": "SwatLessLethalFireRate",
+        "description": "Less lethal fire rate for SWAT."
+      },
+      {
+        "key": "SwatLessLethalFireRateDeviation",
+        "description": null
+      },
+      {
+        "key": "SwatLessLethalSemiFireRateMultiplierStart",
+        "description": null
+      },
+      {
+        "key": "SwatLessLethalSemiFireRateMultiplierEnd",
+        "description": null
+      },
+      {
+        "key": "SwatRifleFireRate",
+        "description": "Rifle fire rate for SWAT."
+      },
+      {
+        "key": "SwatRifleFireRateDeviation",
+        "description": null
+      },
+      {
+        "key": "SwatRifleSemiFireRateMultiplierStart",
+        "description": null
+      },
+      {
+        "key": "SwatRifleSemiFireRateMultiplierEnd",
+        "description": null
+      },
+      {
+        "key": "SwatSMGFireRate",
+        "description": "SMG fire rate for SWAT."
+      },
+      {
+        "key": "SwatSMGFireRateDeviation",
+        "description": null
+      },
+      {
+        "key": "SwatSMGSemiFireRateMultiplierStart",
+        "description": null
+      },
+      {
+        "key": "SwatSMGSemiFireRateMultiplierEnd",
+        "description": null
+      },
+      {
+        "key": "SwatSemiAutoDeviationMultiplier",
+        "description": null
+      },
+      {
+        "key": "SwatSemiAutoDistanceEnd",
+        "description": null
+      },
+      {
+        "key": "SwatDoorLockpickDistance",
+        "description": "Maximum door lockpick distance in centimeters."
+      },
+      {
+        "key": "SwatDoorKickDistance",
+        "description": "Maximum door kick distance in centimeters."
+      },
+      {
+        "key": "SwatDoorShotgunDistance",
+        "description": "Maximum door shotgun breach distance in centimeters."
+      },
+      {
+        "key": "SwatDoorC2PlaceDistance",
+        "description": "Maximum door C2 place distance in centimeters."
+      },
+      {
+        "key": "SwatDoorTrapDisarmDistance",
+        "description": "Maximum door trap disarm distance in centimeters."
+      },
+      {
+        "key": "SwatDoorMirrorDistance",
+        "description": "Maximum door mirror distance in centimeters."
+      },
+      {
+        "key": "SwatDoorWedgeDistance",
+        "description": "Maximum door wedge distance in centimeters."
+      },
+      {
+        "key": "SwatDoorOpenDistance",
+        "description": "Maximum door open distance in centimeters."
+      }
+    ]
+  },
+  {
+    "name": "Mode-specific options",
+    "description": "",
+    "options": [
+      {
+        "key": "ASTimeDelayUntilKill",
+        "description": "Random time delay is chosen between X and Y for the active shooter to wait until they kill their victim"
+      },
+      {
+        "key": "ASTimeBetweenTargetingCivilians",
+        "description": "Time in seconds between targeting civilians in Active Shooter (after killing the first civilian)"
+      },
+      {
+        "key": "ASTimeBeforeTargetingFirstCivilian",
+        "description": "Time in seconds before targeting first civilian in Active Shooter."
+      },
+      {
+        "key": "ASAnnounceKillVoiceLineInterval",
+        "description": null
+      },
+      {
+        "key": "HRMaxDistanceFromSelectedSpawner",
+        "description": "Maximum distance that AI can spawn from the first selected spawn point in Hostage Rescue."
+      },
+      {
+        "key": "HRMaxRoamers",
+        "description": "Maximum number of roamers (AI that can go anywhere) in Hostage Rescue."
+      },
+      {
+        "key": "BombTimer",
+        "description": "Time until Bomb Threat explodes."
+      },
+      {
+        "key": "MaxBombs",
+        "description": null
+      },
+      {
+        "key": "BTMaxBombs",
+        "description": "Maximum number of bombs in Bomb Threat. (F: Every mission has a maximum hardcoded limit)"
+      },
+      {
+        "key": "BTMaxDistanceFromSelectedBombs",
+        "description": "Maximum distance that AI can spawn from each bomb that is selected in Bomb Threat."
+      },
+      {
+        "key": "BombTimerRepeatWarning",
+        "description": "Repeat Bomb warning every X seconds once timer is below BombTimerWarning"
+      },
+      {
+        "key": "BombTimerWarning",
+        "description": "Seconds until detonation when TOC will play bomb warning audio"
+      }
+    ]
+  }
+]
